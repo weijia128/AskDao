@@ -1,0 +1,3 @@
+<view class="question-type-picker">
+  <slot />
+</view>

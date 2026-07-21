@@ -1,0 +1,50 @@
+.result-card {
+  margin-top: 36rpx;
+  padding: 38rpx;
+}
+
+.method {
+  color: rgba(216, 174, 103, 0.82);
+  font-size: 26rpx;
+}
+
+.grade {
+  margin-top: 24rpx;
+  color: #f6efe2;
+  font-size: 120rpx;
+  font-family: "Songti SC", serif;
+  line-height: 1;
+}
+
+.oracle {
+  margin-top: 28rpx;
+  color: #f3db9a;
+  font-size: 34rpx;
+  line-height: 1.45;
+}
+
+.text,
+.hint,
+.question,
+.disclaimer {
+  margin-top: 24rpx;
+  color: rgba(246, 239, 226, 0.74);
+  font-size: 28rpx;
+  line-height: 1.62;
+}
+
+.disclaimer {
+  color: rgba(246, 239, 226, 0.46);
+  font-size: 22rpx;
+}
+
+.actions {
+  margin-top: 34rpx;
+}
+
+.secondary-button {
+  margin-top: 20rpx;
+  padding: 26rpx 32rpx;
+  color: #d8ae67;
+  text-align: center;
+}

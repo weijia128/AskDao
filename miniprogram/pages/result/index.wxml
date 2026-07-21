@@ -1,0 +1,16 @@
+<view class="page-shell result-page">
+  <view class="result-card glass-card" wx:if="{{record}}">
+    <view class="method">小六壬 · {{record.rule_result.symbol}}</view>
+    <view class="grade">{{record.rule_result.grade}}</view>
+    <view class="oracle">{{record.interpretation.oracleText}}</view>
+    <view class="text">{{record.interpretation.explanation}}</view>
+    <view class="hint">{{record.interpretation.actionHint}}</view>
+    <view class="question">{{record.interpretation.reflectionQuestion}}</view>
+    <view class="disclaimer">{{record.interpretation.disclaimer}}</view>
+  </view>
+
+  <view class="actions" wx:if="{{record}}">
+    <view class="primary-button" bindtap="handleSavePoster">保存分享卡片</view>
+    <view class="secondary-button" bindtap="handleAskAgain">再问一次</view>
+  </view>
+</view>

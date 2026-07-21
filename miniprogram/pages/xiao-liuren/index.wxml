@@ -1,0 +1,8 @@
+<view class="page-shell ritual-page">
+  <view class="circle">
+    <view class="inner">问</view>
+  </view>
+  <view class="title">正在起念</view>
+  <view class="subtitle">以此刻为始，取月、日、时。</view>
+  <view class="primary-button" bindtap="handleDivine">查看结果</view>
+</view>

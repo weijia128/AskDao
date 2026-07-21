@@ -1,0 +1,7 @@
+<view class="page-shell history-page">
+  <view class="title">最近问道</view>
+  <view wx:for="{{records}}" wx:key="id" class="history-card glass-card">
+    <view class="line">{{item.rule_result.symbol}} · {{item.rule_result.grade}}</view>
+    <view class="sub">{{item.interpretation.oracleText}}</view>
+  </view>
+</view>

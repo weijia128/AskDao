@@ -1,0 +1,18 @@
+{
+  "pages": [
+    "pages/home/index",
+    "pages/question/index",
+    "pages/xiao-liuren/index",
+    "pages/result/index",
+    "pages/history/index"
+  ],
+  "window": {
+    "navigationBarTitleText": "问道",
+    "navigationBarBackgroundColor": "#10100f",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#10100f"
+  },
+  "sitemapLocation": "sitemap.json",
+  "style": "v2",
+  "componentFramework": "glass-easel"
+}

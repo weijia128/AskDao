@@ -1,0 +1,22 @@
+.title {
+  margin: 32rpx 0;
+  color: #f6efe2;
+  font-size: 42rpx;
+  font-family: "Songti SC", serif;
+}
+
+.history-card {
+  margin-bottom: 20rpx;
+  padding: 28rpx;
+}
+
+.line {
+  color: #f3db9a;
+  font-size: 30rpx;
+}
+
+.sub {
+  margin-top: 12rpx;
+  color: rgba(246, 239, 226, 0.64);
+  font-size: 24rpx;
+}

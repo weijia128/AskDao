@@ -1,0 +1,40 @@
+.ritual-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.circle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 280rpx;
+  height: 280rpx;
+  border: 2rpx solid rgba(216, 174, 103, 0.48);
+  border-radius: 50%;
+  box-shadow: 0 0 80rpx rgba(216, 174, 103, 0.18);
+}
+
+.inner {
+  color: #d8ae67;
+  font-size: 96rpx;
+  font-family: "Songti SC", serif;
+}
+
+.title {
+  margin-top: 48rpx;
+  color: #f6efe2;
+  font-size: 40rpx;
+}
+
+.subtitle {
+  margin-top: 16rpx;
+  color: rgba(246, 239, 226, 0.6);
+  font-size: 26rpx;
+}
+
+.primary-button {
+  width: 80%;
+  margin-top: 56rpx;
+}

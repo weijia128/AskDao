@@ -1,0 +1,25 @@
+<view class="page-shell question-page">
+  <view class="title">你想问什么？</view>
+  <view class="subtitle">选一个方向即可，想说的话可以不填。</view>
+
+  <view class="type-grid">
+    <view
+      wx:for="{{questionTypes}}"
+      wx:key="value"
+      class="type-card {{selectedType === item.value ? 'active' : ''}}"
+      data-value="{{item.value}}"
+      bindtap="handleSelectType"
+    >
+      {{item.label}}
+    </view>
+  </view>
+
+  <textarea
+    class="question-input"
+    placeholder="想说的话，可不填"
+    maxlength="80"
+    bindinput="handleInput"
+  />
+
+  <view class="primary-button" bindtap="handleContinue">开始起念</view>
+</view>

@@ -1,0 +1,3 @@
+<view class="ritual-button" bindtap="handleTap">
+  <slot />
+</view>

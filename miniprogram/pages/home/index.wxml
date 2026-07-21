@@ -1,0 +1,22 @@
+<view class="page-shell home-page">
+  <view class="ritual-rule">{{ritualRule}}</view>
+  <view class="ritual-hint">{{ritualRuleHint}}</view>
+
+  <view class="daily-card glass-card">
+    <view class="eyebrow">今日问道</view>
+    <view class="symbol">{{dailySymbol}}</view>
+    <view class="grade">今日之象 · {{dailyGrade}}</view>
+    <view class="hint">{{dailyHint}}</view>
+    <view class="question">{{dailyQuestion}}</view>
+    <view class="primary-button" bindtap="handleStart">开始问道</view>
+  </view>
+
+  <view class="section-title">快速问事</view>
+  <view class="method-card glass-card" bindtap="handleQuickStart">
+    <view>
+      <view class="method-title">小六壬</view>
+      <view class="method-subtitle">遇事不决，六壬决断</view>
+    </view>
+    <view class="method-arrow">›</view>
+  </view>
+</view>

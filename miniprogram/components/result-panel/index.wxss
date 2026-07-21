@@ -1,0 +1,3 @@
+.result-panel {
+  display: block;
+}

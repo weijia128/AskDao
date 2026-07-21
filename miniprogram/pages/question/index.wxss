@@ -1,0 +1,50 @@
+.title {
+  margin-top: 32rpx;
+  color: #f6efe2;
+  font-size: 44rpx;
+  font-family: "Songti SC", serif;
+}
+
+.subtitle {
+  margin-top: 14rpx;
+  color: rgba(246, 239, 226, 0.64);
+  font-size: 26rpx;
+}
+
+.type-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20rpx;
+  margin-top: 42rpx;
+}
+
+.type-card {
+  padding: 28rpx 24rpx;
+  color: rgba(246, 239, 226, 0.8);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1rpx solid rgba(216, 174, 103, 0.2);
+  border-radius: 20rpx;
+  text-align: center;
+}
+
+.type-card.active {
+  color: #17110a;
+  background: #d8ae67;
+}
+
+.question-input {
+  width: 100%;
+  min-height: 180rpx;
+  margin-top: 34rpx;
+  padding: 26rpx;
+  box-sizing: border-box;
+  color: #f6efe2;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1rpx solid rgba(216, 174, 103, 0.2);
+  border-radius: 20rpx;
+  font-size: 28rpx;
+}
+
+.primary-button {
+  margin-top: 36rpx;
+}

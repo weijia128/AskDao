@@ -1,0 +1,86 @@
+.home-page {
+  background:
+    radial-gradient(circle at 80% 12%, rgba(216, 174, 103, 0.18), transparent 30%),
+    radial-gradient(circle at 16% 70%, rgba(169, 61, 47, 0.14), transparent 32%),
+    #10100f;
+}
+
+.ritual-rule {
+  margin-top: 24rpx;
+  color: #f3db9a;
+  font-size: 34rpx;
+  font-family: "Songti SC", serif;
+  letter-spacing: 0;
+}
+
+.ritual-hint {
+  margin-top: 14rpx;
+  color: rgba(246, 239, 226, 0.68);
+  font-size: 24rpx;
+  line-height: 1.6;
+}
+
+.daily-card {
+  margin-top: 44rpx;
+  padding: 36rpx;
+}
+
+.eyebrow {
+  color: rgba(216, 174, 103, 0.82);
+  font-size: 24rpx;
+}
+
+.symbol {
+  margin-top: 24rpx;
+  color: #f6efe2;
+  font-size: 96rpx;
+  line-height: 1.1;
+  font-family: "Songti SC", serif;
+}
+
+.grade,
+.hint,
+.question {
+  margin-top: 18rpx;
+  color: rgba(246, 239, 226, 0.78);
+  font-size: 28rpx;
+  line-height: 1.55;
+}
+
+.question {
+  color: #f3db9a;
+}
+
+.primary-button {
+  margin-top: 34rpx;
+}
+
+.section-title {
+  margin: 46rpx 0 18rpx;
+  color: rgba(246, 239, 226, 0.72);
+  font-size: 26rpx;
+}
+
+.method-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 30rpx 32rpx;
+}
+
+.method-title {
+  color: #f6efe2;
+  font-size: 34rpx;
+  font-weight: 600;
+}
+
+.method-subtitle {
+  margin-top: 10rpx;
+  color: rgba(246, 239, 226, 0.6);
+  font-size: 24rpx;
+}
+
+.method-arrow {
+  color: #d8ae67;
+  font-size: 48rpx;
+}
