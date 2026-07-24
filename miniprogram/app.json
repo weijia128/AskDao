@@ -1,7 +1,6 @@
 {
   "pages": [
     "pages/home/index",
-    "pages/question/index",
     "pages/xiao-liuren/index",
     "pages/result/index",
     "pages/history/index"

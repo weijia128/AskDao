@@ -1,7 +1,24 @@
 <view class="page-shell history-page">
+  <image class="page-background" src="/assets/images/page-bg.png" mode="aspectFill"></image>
+  <view class="page-background-shade"></view>
+
   <view class="title">最近问道</view>
-  <view wx:for="{{records}}" wx:key="id" class="history-card glass-card">
-    <view class="line">{{item.rule_result.symbol}} · {{item.rule_result.grade}}</view>
-    <view class="sub">{{item.interpretation.oracleText}}</view>
+  <view
+    wx:for="{{records}}"
+    wx:key="id"
+    class="history-swipe-row {{openedRecordId == item.id ? 'open' : ''}}"
+    data-id="{{item.id}}"
+    bindtouchstart="handleTouchStart"
+    bindtouchend="handleTouchEnd"
+  >
+    <view class="delete-action" data-id="{{item.id}}" catchtap="handleDeleteRecord">删除</view>
+    <view class="history-card-track">
+      <view class="history-card glass-card">
+        <view class="time">{{item.createdAtText}}</view>
+        <view class="line">{{item.rule_result.symbol}} · {{item.rule_result.grade}}</view>
+        <view class="note" wx:if="{{item.thought_note}}">此念：{{item.thought_note}}</view>
+        <view class="sub">{{item.interpretation.oracleText}}</view>
+      </view>
+    </view>
   </view>
 </view>

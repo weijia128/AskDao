@@ -2,6 +2,7 @@ import test from 'node:test'
 import assert from 'node:assert/strict'
 
 import {
+  buildXiaoLiurenCountPath,
   calculateXiaoLiuren,
   getChineseHour,
   mapRemainderToSymbol,
@@ -46,4 +47,26 @@ test('calculates 农历七月二十一日辰时 as 大安 / 顺', () => {
     grade: '顺',
     created_at: '2026-07-21T07:00:00+08:00',
   })
+})
+
+test('builds hand counting path from the same month day hour formula', () => {
+  const path = buildXiaoLiurenCountPath({
+    lunarMonth: 7,
+    lunarDay: 21,
+    hourIndex: 5,
+  })
+
+  assert.equal(path.length, 31)
+  assert.deepEqual(path.slice(0, 8), [0, 1, 2, 3, 4, 5, 0, 1])
+  assert.equal(path[path.length - 1], 0)
+})
+
+test('hand counting path lands on 空亡 when the rule remainder is 0', () => {
+  const path = buildXiaoLiurenCountPath({
+    lunarMonth: 1,
+    lunarDay: 1,
+    hourIndex: 6,
+  })
+
+  assert.deepEqual(path, [0, 1, 2, 3, 4, 5])
 })

@@ -5,5 +5,8 @@
   "type": "module",
   "scripts": {
     "test": "node --test \"miniprogram/tests/*.test.mjs\""
+  },
+  "dependencies": {
+    "lunar-javascript": "^1.7.7"
   }
 }

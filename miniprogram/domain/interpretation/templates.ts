@@ -44,4 +44,4 @@ export const symbolTemplates: Record<XiaoLiurenSymbol, {
   },
 }
 
-export const disclaimer = '问道结果仅作传统文化体验与自我参考，不作为现实决策的唯一依据。'
+export const disclaimer = '仅供传统文化体验与自我参考。'

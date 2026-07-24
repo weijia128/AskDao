@@ -1,9 +1,155 @@
-.result-card {
-  margin-top: 36rpx;
-  padding: 38rpx;
+.result-page {
+  padding: 20rpx 16rpx 48rpx;
+}
+
+.result-card-shell {
+  position: relative;
+  width: 100%;
+  height: 78vh;
+  min-height: 820rpx;
+  margin-top: 16rpx;
+  perspective: 1600rpx;
+  transform-style: preserve-3d;
+}
+
+.card-face {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  padding: 44rpx 42rpx;
+  box-sizing: border-box;
+  border: 1rpx solid rgba(214, 167, 92, 0.24);
+  border-radius: 24rpx;
+  box-shadow: 0 24rpx 80rpx rgba(0, 0, 0, 0.24);
+  backface-visibility: hidden;
+  transition: transform 0.42s ease;
+  overflow: hidden;
+}
+
+.card-front {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: rotateY(0deg);
+}
+
+.front-content {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transform: translate(-50%, -50%);
+}
+
+.card-back {
+  background: rgba(255, 255, 255, 0.1);
+  transform: rotateY(-180deg);
+  overflow-y: auto;
+}
+
+.result-card-shell.flipped .card-front {
+  transform: rotateY(180deg);
+}
+
+.result-card-shell.flipped .card-back {
+  transform: rotateY(0deg);
+}
+
+.result-symbol {
+  display: flex;
+  flex-direction: column;
+  gap: 28rpx;
+  align-items: center;
+  justify-content: center;
+  color: #fff6d8;
+  font-size: 142rpx;
+  font-family: "Songti SC", serif;
+  font-weight: 700;
+  letter-spacing: 0;
+  line-height: 1;
+  text-shadow: 0 10rpx 34rpx rgba(0, 0, 0, 0.34);
+}
+
+.symbol-char {
+  display: block;
+}
+
+.result-lunar-time {
+  position: absolute;
+  right: 42rpx;
+  bottom: 52rpx;
+  left: 42rpx;
+  color: rgba(255, 246, 216, 0.68);
+  font-size: 28rpx;
+  font-family: "Songti SC", serif;
+  letter-spacing: 0;
+  line-height: 1.2;
+  text-align: center;
+}
+
+.tone-da-an .card-front {
+  background:
+    radial-gradient(circle at 50% 44%, rgba(243, 219, 154, 0.28), transparent 42%),
+    linear-gradient(145deg, rgba(65, 100, 80, 0.94), rgba(29, 42, 35, 0.96));
+  border-color: rgba(209, 221, 176, 0.46);
+}
+
+.tone-liu-lian .card-front {
+  background:
+    radial-gradient(circle at 48% 42%, rgba(227, 191, 119, 0.22), transparent 44%),
+    linear-gradient(145deg, rgba(102, 93, 78, 0.94), rgba(42, 41, 39, 0.96));
+  border-color: rgba(216, 174, 103, 0.38);
+}
+
+.tone-su-xi .card-front {
+  background:
+    radial-gradient(circle at 52% 42%, rgba(255, 229, 157, 0.3), transparent 42%),
+    linear-gradient(145deg, rgba(151, 74, 54, 0.94), rgba(81, 38, 31, 0.96));
+  border-color: rgba(243, 219, 154, 0.46);
+}
+
+.tone-chi-kou .card-front {
+  background:
+    radial-gradient(circle at 52% 42%, rgba(213, 88, 70, 0.26), transparent 42%),
+    linear-gradient(145deg, rgba(103, 40, 38, 0.94), rgba(40, 24, 24, 0.96));
+  border-color: rgba(214, 99, 82, 0.44);
+}
+
+.tone-xiao-ji .card-front {
+  background:
+    radial-gradient(circle at 50% 42%, rgba(243, 219, 154, 0.24), transparent 42%),
+    linear-gradient(145deg, rgba(62, 111, 99, 0.94), rgba(28, 49, 46, 0.96));
+  border-color: rgba(174, 217, 199, 0.42);
+}
+
+.tone-kong-wang .card-front {
+  background:
+    radial-gradient(circle at 50% 42%, rgba(214, 167, 92, 0.18), transparent 44%),
+    linear-gradient(145deg, rgba(59, 65, 70, 0.94), rgba(17, 20, 22, 0.96));
+  border-color: rgba(196, 201, 202, 0.3);
+}
+
+.card-save-button {
+  position: absolute;
+  top: 26rpx;
+  right: 28rpx;
+  padding: 12rpx 20rpx;
+  color: #17110a;
+  background: rgba(243, 219, 154, 0.92);
+  border-radius: 999rpx;
+  font-size: 22rpx;
+  font-weight: 600;
+  line-height: 1.2;
+  z-index: 6;
 }
 
 .method {
+  padding-right: 150rpx;
   color: rgba(216, 174, 103, 0.82);
   font-size: 26rpx;
 }
@@ -38,8 +184,111 @@
   font-size: 22rpx;
 }
 
+.thought-entry {
+  margin-top: 28rpx;
+}
+
+.thought-saved-summary {
+  margin-bottom: 16rpx;
+  padding: 22rpx 26rpx;
+  color: rgba(243, 219, 154, 0.86);
+  background: rgba(216, 174, 103, 0.1);
+  border: 1rpx solid rgba(216, 174, 103, 0.18);
+  border-radius: 16rpx;
+  font-size: 26rpx;
+  line-height: 1.5;
+}
+
+.thought-trigger {
+  margin-top: 0;
+  padding: 24rpx 32rpx;
+  color: #d8ae67;
+  text-align: center;
+}
+
+.thought-note {
+  margin-top: 28rpx;
+  padding: 30rpx;
+}
+
+.thought-title {
+  color: #f3db9a;
+  font-size: 30rpx;
+  font-weight: 600;
+}
+
+.thought-helper {
+  margin-top: 12rpx;
+  color: rgba(246, 239, 226, 0.58);
+  font-size: 24rpx;
+  line-height: 1.55;
+}
+
+.thought-input {
+  width: 100%;
+  min-height: 132rpx;
+  margin-top: 20rpx;
+  padding: 22rpx;
+  box-sizing: border-box;
+  color: #f6efe2;
+  background: rgba(16, 16, 15, 0.48);
+  border: 1rpx solid rgba(216, 174, 103, 0.24);
+  border-radius: 16rpx;
+  font-size: 26rpx;
+  line-height: 1.5;
+}
+
+.thought-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18rpx;
+  margin-top: 22rpx;
+}
+
+.thought-save-button,
+.thought-close-button {
+  min-height: 76rpx;
+  font-size: 26rpx;
+}
+
+.thought-close-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #d8ae67;
+  border: 1rpx solid rgba(216, 174, 103, 0.34);
+  border-radius: 999rpx;
+}
+
 .actions {
   margin-top: 34rpx;
+}
+
+.history-button {
+  margin-bottom: 18rpx;
+  padding: 24rpx 32rpx;
+  color: #d8ae67;
+  background: rgba(12, 14, 12, 0.28);
+  border: 1rpx solid rgba(216, 174, 103, 0.3);
+  border-radius: 999rpx;
+}
+
+.share-button {
+  width: 100%;
+  border: 0;
+  line-height: 1.4;
+}
+
+.share-button::after {
+  border: 0;
+}
+
+.result-card-canvas {
+  position: fixed;
+  top: -9999px;
+  left: -9999px;
+  width: 375px;
+  height: 560px;
 }
 
 .secondary-button {

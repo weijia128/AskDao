@@ -1,8 +1,18 @@
 <view class="page-shell ritual-page">
-  <view class="circle">
-    <view class="inner">问</view>
+  <image class="page-background" src="/assets/images/page-bg.png" mode="aspectFill"></image>
+  <view class="page-background-shade"></view>
+
+  <view class="ritual-action {{isDivining ? 'active' : ''}}" bindtap="handleDivine">
+    <view class="spinning-ring" wx:if="{{isDivining}}"></view>
+    <view class="circle">
+      <view class="inner">{{isDivining ? '起课中' : '起念'}}</view>
+    </view>
   </view>
-  <view class="title">正在起念</view>
-  <view class="subtitle">以此刻为始，取月、日、时。</view>
-  <view class="primary-button" bindtap="handleDivine">查看结果</view>
+  <view class="title">心中默念所想</view>
+  <view class="guidance">
+    <view>请在心中默问一件小事，一个方向。</view>
+    <view class="guidance-line">宜问：这件事今天推进，是否合适？</view>
+    <view class="guidance-line">不宜问：我应该怎么办？</view>
+    <view class="guidance-note">不以玩笑试探，不反复追问同一事。</view>
+  </view>
 </view>

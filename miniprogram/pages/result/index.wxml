@@ -1,16 +1,63 @@
 <view class="page-shell result-page">
-  <view class="result-card glass-card" wx:if="{{record}}">
-    <view class="method">小六壬 · {{record.rule_result.symbol}}</view>
-    <view class="grade">{{record.rule_result.grade}}</view>
-    <view class="oracle">{{record.interpretation.oracleText}}</view>
-    <view class="text">{{record.interpretation.explanation}}</view>
-    <view class="hint">{{record.interpretation.actionHint}}</view>
-    <view class="question">{{record.interpretation.reflectionQuestion}}</view>
-    <view class="disclaimer">{{record.interpretation.disclaimer}}</view>
+  <image class="page-background" src="/assets/images/page-bg.png" mode="aspectFill"></image>
+  <view class="page-background-shade"></view>
+
+  <view
+    class="result-card-shell result-card {{symbolTone}} {{isCardBackVisible ? 'flipped' : ''}}"
+    wx:if="{{record}}"
+    bindtap="handleToggleCardFace"
+  >
+    <view class="card-save-button" catchtap="handleSavePoster">保存卡片</view>
+    <view class="card-face card-front">
+      <view class="front-content">
+        <view class="result-symbol">
+          <view wx:for="{{symbolChars}}" wx:key="*this" class="symbol-char">{{item}}</view>
+        </view>
+      </view>
+      <view class="result-lunar-time">{{lunarTimeText}}</view>
+    </view>
+    <view class="card-face card-back">
+      <view class="method">小六壬断课 · {{record.rule_result.symbol}}</view>
+      <view class="grade">{{record.rule_result.grade}}</view>
+      <view class="oracle">{{record.interpretation.oracleText}}</view>
+      <view class="text">{{record.interpretation.explanation}}</view>
+      <view class="hint">{{record.interpretation.actionHint}}</view>
+      <view class="question">{{record.interpretation.reflectionQuestion}}</view>
+      <view class="disclaimer">{{record.interpretation.disclaimer}}</view>
+    </view>
+  </view>
+
+  <view class="thought-entry" wx:if="{{record && !showThoughtNoteCard}}">
+    <view class="thought-saved-summary" wx:if="{{record.thought_note}}">此念：{{record.thought_note}}</view>
+    <view class="secondary-button thought-trigger" bindtap="handleOpenThoughtNote">
+      <block wx:if="{{record.thought_note}}">修改此念</block>
+      <block wx:else>记下此念</block>
+    </view>
+  </view>
+
+  <view class="thought-note glass-card" wx:if="{{record && showThoughtNoteCard}}">
+    <view class="thought-title">记下此念</view>
+    <view class="thought-helper">可用一句话记下刚才心中所问，仅用于日后回看，不参与起课。</view>
+    <textarea
+      class="thought-input"
+      value="{{thoughtNote}}"
+      maxlength="60"
+      placeholder="例如：这周是否适合推进某件事"
+      bindinput="handleThoughtInput"
+    ></textarea>
+    <view class="thought-actions">
+      <view class="primary-button thought-save-button" bindtap="handleSaveThought">保存此念</view>
+      <view class="thought-close-button" bindtap="handleCloseThoughtNote">关闭</view>
+    </view>
   </view>
 
   <view class="actions" wx:if="{{record}}">
-    <view class="primary-button" bindtap="handleSavePoster">保存分享卡片</view>
-    <view class="secondary-button" bindtap="handleAskAgain">再问一次</view>
+    <view class="secondary-button history-button" bindtap="handleOpenHistory">查看问道记录</view>
+    <view class="primary-button share-button" bindtap="handleShareResultCard">
+      <block wx:if="{{isBuildingCard}}">生成中</block>
+      <block wx:else>分享断课卡片</block>
+    </view>
   </view>
+
+  <canvas class="result-card-canvas" canvas-id="resultCardCanvas"></canvas>
 </view>

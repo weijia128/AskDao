@@ -1,13 +1,21 @@
 import { runXiaoLiurenDivination } from '../../application/divination-service'
+import { buildXiaoLiurenCountPath } from '../../domain/rules/xiao-liuren'
 import { saveHistoryRecord } from '../../services/storage'
 import { track } from '../../services/analytics'
+import { canStartDailyDivination, recordDailyDivination } from '../../services/daily-limit.core'
+
+const ANIMATION_STEP_MS = 90
+const ANIMATION_SETTLE_MS = 260
 
 Page({
   data: {
     entry: 'daily',
     questionType: 'daily_state',
     questionText: '',
+    isDivining: false,
   },
+
+  countTimer: 0,
 
   onLoad(options) {
     this.setData({
@@ -18,14 +26,49 @@ Page({
     track('page_view', { page: 'xiao-liuren', source: this.data.entry })
   },
 
+  onUnload() {
+    this.clearCountTimer()
+  },
+
+  clearCountTimer() {
+    if (this.countTimer) {
+      clearTimeout(this.countTimer)
+      this.countTimer = 0
+    }
+  },
+
+  runCountAnimation(countPath: number[], onComplete: () => void) {
+    this.clearCountTimer()
+    const waitMs = Math.max(countPath.length, 1) * ANIMATION_STEP_MS + ANIMATION_SETTLE_MS
+    this.countTimer = setTimeout(() => {
+      this.countTimer = 0
+      onComplete()
+    }, waitMs)
+  },
+
   async handleDivine() {
+    if (this.data.isDivining) {
+      return
+    }
+
+    if (!canStartDailyDivination(wx)) {
+      wx.showModal({
+        title: '今日三问已满',
+        content: '问道重在一念，不宜反复试探。明日再来，取新的时机。',
+        showCancel: false,
+      })
+      return
+    }
+
+    const startedAt = new Date().toISOString()
+    this.setData({ isDivining: true })
     track('start_divination', { method: 'xiao_liuren' })
 
     const result = await runXiaoLiurenDivination({
       method: 'xiao_liuren',
       questionType: this.data.questionType,
       questionText: this.data.questionText,
-      startedAt: new Date().toISOString(),
+      startedAt,
       timezone: 'Asia/Shanghai',
       source: this.data.entry,
     })
@@ -36,6 +79,7 @@ Page({
         content: result.risk.message,
         showCancel: false,
       })
+      this.setData({ isDivining: false })
       return
     }
 
@@ -51,11 +95,22 @@ Page({
 
     wx.setStorageSync('askdao_latest_result', record)
     saveHistoryRecord(record)
+    recordDailyDivination(wx)
     track('complete_divination', {
       symbol: result.ruleResult.symbol,
       grade: result.ruleResult.grade,
       rule_version: result.ruleResult.rule_version,
     })
-    wx.navigateTo({ url: '/pages/result/index' })
+
+    const countPath = buildXiaoLiurenCountPath({
+      lunarMonth: result.ruleResult.input_snapshot.lunar_month,
+      lunarDay: result.ruleResult.input_snapshot.lunar_day,
+      hourIndex: result.ruleResult.input_snapshot.hour_index,
+    })
+
+    this.runCountAnimation(countPath, () => {
+      this.setData({ isDivining: false })
+      wx.navigateTo({ url: '/pages/result/index' })
+    })
   },
 })

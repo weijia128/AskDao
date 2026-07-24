@@ -5,9 +5,48 @@
   font-family: "Songti SC", serif;
 }
 
-.history-card {
+.history-swipe-row {
+  position: relative;
+  overflow: hidden;
   margin-bottom: 20rpx;
+  border-radius: 24rpx;
+}
+
+.history-card-track {
+  position: relative;
+  transition: transform 0.18s ease;
+  z-index: 2;
+}
+
+.history-swipe-row.open .history-card-track {
+  transform: translateX(-154rpx);
+}
+
+.delete-action {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 154rpx;
+  color: rgba(246, 239, 226, 0.72);
+  background: rgba(15, 17, 15, 0.42);
+  border-left: 1rpx solid rgba(216, 174, 103, 0.16);
+  font-size: 28rpx;
+  font-weight: 600;
+  z-index: 1;
+}
+
+.history-card {
   padding: 28rpx;
+}
+
+.time {
+  margin-bottom: 14rpx;
+  color: rgba(246, 239, 226, 0.48);
+  font-size: 22rpx;
 }
 
 .line {
@@ -19,4 +58,11 @@
   margin-top: 12rpx;
   color: rgba(246, 239, 226, 0.64);
   font-size: 24rpx;
+}
+
+.note {
+  margin-top: 14rpx;
+  color: rgba(243, 219, 154, 0.82);
+  font-size: 26rpx;
+  line-height: 1.5;
 }

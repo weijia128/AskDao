@@ -1,86 +1,159 @@
 .home-page {
-  background:
-    radial-gradient(circle at 80% 12%, rgba(216, 174, 103, 0.18), transparent 30%),
-    radial-gradient(circle at 16% 70%, rgba(169, 61, 47, 0.14), transparent 32%),
-    #10100f;
+  padding-bottom: 56rpx;
+}
+
+.hero {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  padding-top: 96rpx;
+}
+
+.taiji-entry {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: transform 0.18s ease, opacity 0.18s ease;
+}
+
+.taiji-entry-active {
+  opacity: 0.88;
+  transform: scale(0.98);
+}
+
+.bagua-image {
+  width: 360rpx;
+  height: 360rpx;
+  border-radius: 50%;
+  background: rgba(245, 239, 223, 0.92);
+  box-shadow: 0 24rpx 80rpx rgba(23, 19, 15, 0.18);
+}
+
+.entry-button {
+  min-width: 248rpx;
+  margin-top: 30rpx;
+  padding: 22rpx 44rpx;
+  box-sizing: border-box;
+  color: #f3db9a;
+  background: rgba(17, 16, 14, 0.48);
+  border: 1rpx solid rgba(243, 219, 154, 0.58);
+  border-radius: 999rpx;
+  box-shadow: 0 18rpx 52rpx rgba(0, 0, 0, 0.28);
+  font-size: 36rpx;
+  font-family: "Songti SC", serif;
+  font-weight: 700;
+  text-align: center;
+  text-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.36);
+}
+
+.ritual-rules {
+  position: relative;
+  margin-top: 52rpx;
 }
 
 .ritual-rule {
-  margin-top: 24rpx;
-  color: #f3db9a;
-  font-size: 34rpx;
-  font-family: "Songti SC", serif;
-  letter-spacing: 0;
-}
-
-.ritual-hint {
-  margin-top: 14rpx;
-  color: rgba(246, 239, 226, 0.68);
-  font-size: 24rpx;
-  line-height: 1.6;
-}
-
-.daily-card {
-  margin-top: 44rpx;
-  padding: 36rpx;
-}
-
-.eyebrow {
-  color: rgba(216, 174, 103, 0.82);
-  font-size: 24rpx;
-}
-
-.symbol {
-  margin-top: 24rpx;
-  color: #f6efe2;
-  font-size: 96rpx;
-  line-height: 1.1;
-  font-family: "Songti SC", serif;
-}
-
-.grade,
-.hint,
-.question {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
   margin-top: 18rpx;
-  color: rgba(246, 239, 226, 0.78);
-  font-size: 28rpx;
+}
+
+.ritual-rule-title {
+  color: #f6efe2;
+  font-size: 32rpx;
+  font-family: "Songti SC", serif;
+  text-shadow: 0 4rpx 14rpx rgba(0, 0, 0, 0.38);
+}
+
+.ritual-rule-text {
+  margin-left: 20rpx;
+  color: rgba(246, 239, 226, 0.72);
+  font-size: 24rpx;
+}
+
+.ritual-limit {
+  position: relative;
+  margin-top: 30rpx;
+  color: rgba(246, 239, 226, 0.64);
+  font-size: 24rpx;
+  text-align: center;
   line-height: 1.55;
 }
 
-.question {
+.history-entry {
+  position: relative;
+  width: 240rpx;
+  margin: 24rpx auto 0;
+  padding: 18rpx 0;
   color: #f3db9a;
-}
-
-.primary-button {
-  margin-top: 34rpx;
-}
-
-.section-title {
-  margin: 46rpx 0 18rpx;
-  color: rgba(246, 239, 226, 0.72);
+  background: rgba(12, 14, 12, 0.32);
+  border: 1rpx solid rgba(243, 219, 154, 0.38);
+  border-radius: 999rpx;
   font-size: 26rpx;
+  text-align: center;
 }
 
-.method-card {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 30rpx 32rpx;
-}
-
-.method-title {
+.almanac-panel {
+  position: relative;
+  margin-top: 56rpx;
+  padding-bottom: 36rpx;
   color: #f6efe2;
-  font-size: 34rpx;
+}
+
+.almanac-title {
+  color: #f3db9a;
+  font-size: 32rpx;
+  font-family: "Songti SC", serif;
+}
+
+.almanac-date,
+.almanac-lunar,
+.almanac-meta {
+  margin-top: 14rpx;
+  color: rgba(246, 239, 226, 0.72);
+  font-size: 24rpx;
+  line-height: 1.5;
+}
+
+.almanac-row {
+  display: flex;
+  margin-top: 24rpx;
+}
+
+.almanac-label {
+  flex: 0 0 48rpx;
+  color: #f3db9a;
+  font-size: 28rpx;
   font-weight: 600;
 }
 
-.method-subtitle {
-  margin-top: 10rpx;
-  color: rgba(246, 239, 226, 0.6);
-  font-size: 24rpx;
+.almanac-label.muted {
+  color: rgba(246, 239, 226, 0.58);
 }
 
-.method-arrow {
-  color: #d8ae67;
-  font-size: 48rpx;
+.almanac-items {
+  flex: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+}
+
+.almanac-item {
+  padding: 6rpx 14rpx;
+  color: rgba(246, 239, 226, 0.84);
+  border: 1rpx solid rgba(243, 219, 154, 0.28);
+  border-radius: 999rpx;
+  font-size: 22rpx;
+}
+
+.almanac-item.muted {
+  color: rgba(246, 239, 226, 0.62);
+  border-color: rgba(246, 239, 226, 0.18);
+}
+
+.almanac-note {
+  margin-top: 28rpx;
+  color: rgba(246, 239, 226, 0.42);
+  font-size: 22rpx;
+  line-height: 1.5;
 }

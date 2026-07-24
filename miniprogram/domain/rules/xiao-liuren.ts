@@ -1,6 +1,7 @@
 import type { RuleResult } from './types'
 
 import {
+  buildXiaoLiurenCountPath as buildCountPathCore,
   calculateXiaoLiuren as calculateCore,
   getChineseHour as getChineseHourCore,
 } from './xiao-liuren.core'
@@ -15,6 +16,10 @@ export interface XiaoLiurenInput {
 
 export function calculateXiaoLiuren(input: XiaoLiurenInput): RuleResult {
   return calculateCore(input) as RuleResult
+}
+
+export function buildXiaoLiurenCountPath(input: Pick<XiaoLiurenInput, 'lunarMonth' | 'lunarDay' | 'hourIndex'>): number[] {
+  return buildCountPathCore(input) as number[]
 }
 
 export function getChineseHour(hour: number): {

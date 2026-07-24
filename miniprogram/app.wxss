@@ -1,14 +1,45 @@
 page {
   min-height: 100vh;
   color: #f6efe2;
-  background: #10100f;
+  background: #111310;
   font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", sans-serif;
 }
 
 .page-shell {
+  position: relative;
+  overflow: hidden;
   min-height: 100vh;
   padding: 40rpx 32rpx;
   box-sizing: border-box;
+  background: #111310;
+}
+
+.page-background,
+.page-background-shade {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+}
+
+.page-background {
+  z-index: 0;
+  opacity: 0.88;
+}
+
+.page-background-shade {
+  z-index: 0;
+  background:
+    linear-gradient(180deg, rgba(12, 14, 12, 0.2) 0%, rgba(12, 14, 12, 0.5) 54%, rgba(12, 14, 12, 0.78) 100%),
+    rgba(12, 14, 12, 0.18);
+}
+
+.page-shell > view:not(.page-background-shade),
+.page-shell > canvas {
+  position: relative;
+  z-index: 1;
 }
 
 .glass-card {

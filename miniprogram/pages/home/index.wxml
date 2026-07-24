@@ -1,22 +1,45 @@
 <view class="page-shell home-page">
-  <view class="ritual-rule">{{ritualRule}}</view>
-  <view class="ritual-hint">{{ritualRuleHint}}</view>
+  <image class="page-background" src="/assets/images/page-bg.png" mode="aspectFill"></image>
+  <view class="page-background-shade"></view>
 
-  <view class="daily-card glass-card">
-    <view class="eyebrow">今日问道</view>
-    <view class="symbol">{{dailySymbol}}</view>
-    <view class="grade">今日之象 · {{dailyGrade}}</view>
-    <view class="hint">{{dailyHint}}</view>
-    <view class="question">{{dailyQuestion}}</view>
-    <view class="primary-button" bindtap="handleStart">开始问道</view>
+  <view class="hero">
+    <view class="taiji-entry" hover-class="taiji-entry-active" bindtap="handleStart">
+      <image class="bagua-image" src="/assets/images/bagua-taiji.png" mode="aspectFit"></image>
+      <view class="entry-button">问道</view>
+    </view>
   </view>
 
-  <view class="section-title">快速问事</view>
-  <view class="method-card glass-card" bindtap="handleQuickStart">
-    <view>
-      <view class="method-title">小六壬</view>
-      <view class="method-subtitle">遇事不决，六壬决断</view>
+  <view class="ritual-rules">
+    <view wx:for="{{ritualRules}}" wx:key="title" class="ritual-rule">
+      <view class="ritual-rule-title">{{item.title}}</view>
+      <view class="ritual-rule-text">{{item.text}}</view>
     </view>
-    <view class="method-arrow">›</view>
+  </view>
+
+  <view class="ritual-limit">{{dailyLimitText}}</view>
+
+  <view class="history-entry" bindtap="handleOpenHistory">问道记录</view>
+
+  <view class="almanac-panel">
+    <view class="almanac-title">今日黄历</view>
+    <view class="almanac-date">{{almanac.solarText}} · {{almanac.weekdayText}}</view>
+    <view class="almanac-lunar">{{almanac.lunarText}} · {{almanac.ganzhiText}}</view>
+    <view class="almanac-meta">{{almanac.zodiacText}} · {{almanac.chongShaText}}</view>
+
+    <view class="almanac-row">
+      <view class="almanac-label">宜</view>
+      <view class="almanac-items">
+        <text wx:for="{{almanac.yi}}" wx:key="*this" class="almanac-item">{{item}}</text>
+      </view>
+    </view>
+
+    <view class="almanac-row">
+      <view class="almanac-label muted">忌</view>
+      <view class="almanac-items">
+        <text wx:for="{{almanac.ji}}" wx:key="*this" class="almanac-item muted">{{item}}</text>
+      </view>
+    </view>
+
+    <view class="almanac-note">宜忌据 6tail/lunar-javascript 生成，仅供民俗参考。</view>
   </view>
 </view>

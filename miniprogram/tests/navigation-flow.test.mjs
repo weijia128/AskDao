@@ -1,0 +1,263 @@
+import test from 'node:test'
+import assert from 'node:assert/strict'
+import { readFile } from 'node:fs/promises'
+
+const readText = (path) => readFile(new URL(path, import.meta.url), 'utf8')
+
+test('main app flow registers direct ritual flow without question page', async () => {
+  const appJson = JSON.parse(await readText('../app.json'))
+
+  assert.deepEqual(appJson.pages, [
+    'pages/home/index',
+    'pages/xiao-liuren/index',
+    'pages/result/index',
+    'pages/history/index',
+  ])
+})
+
+test('main flow page navigation titles match the ritual sequence', async () => {
+  const homeJson = JSON.parse(await readText('../pages/home/index.json'))
+  const ritualJson = JSON.parse(await readText('../pages/xiao-liuren/index.json'))
+  const resultJson = JSON.parse(await readText('../pages/result/index.json'))
+
+  assert.equal(homeJson.navigationBarTitleText, '问道')
+  assert.equal(ritualJson.navigationBarTitleText, '小六壬')
+  assert.equal(resultJson.navigationBarTitleText, '断课')
+})
+
+test('home starts directly on the ritual page without quick-entry routing', async () => {
+  const homeSource = await readText('../pages/home/index.ts')
+
+  assert.match(homeSource, /\/pages\/xiao-liuren\/index\?entry=daily/)
+  assert.doesNotMatch(homeSource, /handleQuickStart/)
+  assert.doesNotMatch(homeSource, /entry=quick/)
+  assert.doesNotMatch(homeSource, /\/pages\/question\/index/)
+})
+
+test('result page does not encourage immediate repeat questions', async () => {
+  const resultMarkup = await readText('../pages/result/index.wxml')
+  const resultSource = await readText('../pages/result/index.ts')
+
+  assert.match(resultMarkup, /小六壬断课/)
+  assert.doesNotMatch(resultMarkup, /再问一次/)
+  assert.doesNotMatch(resultSource, /handleAskAgain/)
+  assert.doesNotMatch(resultSource, /entry=quick/)
+  assert.doesNotMatch(resultSource, /\/pages\/question\/index/)
+})
+
+test('result page supports optional post-result thought note', async () => {
+  const resultMarkup = await readText('../pages/result/index.wxml')
+  const resultSource = await readText('../pages/result/index.ts')
+  const historyMarkup = await readText('../pages/history/index.wxml')
+
+  assert.match(resultMarkup, /记下此念/)
+  assert.match(resultMarkup, /仅用于日后回看，不参与起课。/)
+  assert.match(resultMarkup, /textarea/)
+  assert.match(resultMarkup, /handleThoughtInput/)
+  assert.match(resultMarkup, /handleOpenThoughtNote/)
+  assert.match(resultMarkup, /handleCloseThoughtNote/)
+  assert.match(resultMarkup, /handleSaveThought/)
+  assert.match(resultMarkup, /showThoughtNoteCard/)
+  assert.match(resultMarkup, /关闭/)
+  assert.match(resultSource, /updateHistoryRecord/)
+  assert.match(resultSource, /showThoughtNoteCard: false/)
+  assert.match(resultSource, /thought_note/)
+  assert.match(historyMarkup, /thought_note/)
+})
+
+test('history page shows generated time and supports swipe deletion', async () => {
+  const historyMarkup = await readText('../pages/history/index.wxml')
+  const historySource = await readText('../pages/history/index.ts')
+  const historyStyles = await readText('../pages/history/index.wxss')
+  const storageSource = await readText('../services/storage.ts')
+
+  assert.match(historyMarkup, /createdAtText/)
+  assert.match(historyMarkup, /history-swipe-row/)
+  assert.match(historyMarkup, /bindtouchstart="handleTouchStart"/)
+  assert.match(historyMarkup, /bindtouchend="handleTouchEnd"/)
+  assert.match(historyMarkup, /delete-action/)
+  assert.match(historyMarkup, /catchtap="handleDeleteRecord"/)
+  assert.match(historyMarkup, /删除/)
+
+  assert.match(historySource, /formatHistoryCreatedAt/)
+  assert.match(historySource, /deleteHistoryRecord/)
+  assert.match(historySource, /openedRecordId/)
+  assert.match(historySource, /touchStartX/)
+  assert.match(historySource, /handleDeleteRecord/)
+  assert.match(storageSource, /removeHistoryRecord/)
+
+  assert.match(historyStyles, /translateX\(-154rpx\)/)
+  assert.match(historyStyles, /\.delete-action/)
+  assert.match(historyStyles, /\.delete-action\s*{[\s\S]*background: rgba\(15, 17, 15, 0\.42\);/)
+  assert.doesNotMatch(historyStyles, /background: rgba\(134, 42, 36/)
+})
+
+test('result page shares the generated result card image instead of the app entry', async () => {
+  const resultMarkup = await readText('../pages/result/index.wxml')
+  const resultSource = await readText('../pages/result/index.ts')
+  const shareSource = await readText('../services/wx-share.ts')
+
+  assert.match(resultMarkup, /card-save-button/)
+  assert.match(resultMarkup, /保存卡片/)
+  assert.match(resultMarkup, /resultCardCanvas/)
+  assert.match(resultMarkup, />分享断课卡片</)
+  assert.doesNotMatch(resultMarkup, /open-type="share"/)
+  assert.doesNotMatch(resultMarkup, />转发给好友</)
+  assert.doesNotMatch(resultMarkup, /保存分享卡片/)
+
+  assert.match(resultSource, /wx\.showShareImageMenu/)
+  assert.match(resultSource, /wx\.saveImageToPhotosAlbum/)
+  assert.match(resultSource, /wx\.canvasToTempFilePath/)
+  assert.match(resultSource, /buildResultCardImageModel/)
+  assert.match(resultSource, /model\.lunarTimeText/)
+  assert.match(resultSource, /needShowEntrance: true/)
+  assert.match(resultSource, /entrancePath/)
+
+  assert.match(shareSource, /buildResultCardEntrancePath/)
+  assert.doesNotMatch(shareSource, /thought_note/)
+})
+
+test('ritual page title uses silent question copy', async () => {
+  const ritualMarkup = await readText('../pages/xiao-liuren/index.wxml')
+
+  assert.match(ritualMarkup, />心中默念所想</)
+  assert.doesNotMatch(ritualMarkup, /心中默问起念/)
+  assert.doesNotMatch(ritualMarkup, /静心一念，以此刻取月、日、时。/)
+})
+
+test('home shows the small-question and three-question rule', async () => {
+  const homeMarkup = await readText('../pages/home/index.wxml')
+  const homeSource = await readText('../pages/home/index.ts')
+
+  assert.match(homeMarkup, /dailyLimitText/)
+  assert.match(homeSource, /每日最多三问/)
+})
+
+test('home and result pages expose history entry points', async () => {
+  const homeMarkup = await readText('../pages/home/index.wxml')
+  const homeSource = await readText('../pages/home/index.ts')
+  const resultMarkup = await readText('../pages/result/index.wxml')
+  const resultSource = await readText('../pages/result/index.ts')
+
+  assert.match(homeMarkup, /问道记录/)
+  assert.match(homeMarkup, /handleOpenHistory/)
+  assert.match(homeSource, /\/pages\/history\/index/)
+  assert.match(resultMarkup, /查看问道记录/)
+  assert.match(resultMarkup, /handleOpenHistory/)
+  assert.match(resultSource, /\/pages\/history\/index/)
+})
+
+test('result page shows a symbolic front card that flips to interpretation', async () => {
+  const resultMarkup = await readText('../pages/result/index.wxml')
+  const resultSource = await readText('../pages/result/index.ts')
+  const resultStyles = await readText('../pages/result/index.wxss')
+
+  assert.match(resultMarkup, /result-card-shell/)
+  assert.match(resultMarkup, /bindtap="handleToggleCardFace"/)
+  assert.match(resultMarkup, /{{symbolTone}}/)
+  assert.match(resultMarkup, /{{isCardBackVisible \? 'flipped' : ''}}/)
+  assert.match(resultMarkup, /card-face card-front/)
+  assert.match(resultMarkup, /result-symbol/)
+  assert.match(resultMarkup, /symbol-char/)
+  assert.match(resultMarkup, /wx:for="{{symbolChars}}"/)
+  assert.match(resultMarkup, /{{record\.rule_result\.symbol}}/)
+  assert.match(resultMarkup, /result-lunar-time/)
+  assert.match(resultMarkup, /{{lunarTimeText}}/)
+  assert.match(resultMarkup, /card-face card-back/)
+  assert.match(resultMarkup, /record\.interpretation\.oracleText/)
+  assert.match(resultMarkup, /record\.interpretation\.explanation/)
+  assert.match(resultMarkup, /catchtap="handleSavePoster"/)
+
+  assert.match(resultSource, /SYMBOL_TONES/)
+  assert.match(resultSource, /isCardBackVisible: false/)
+  assert.match(resultSource, /splitResultSymbol/)
+  assert.match(resultSource, /symbolChars/)
+  assert.match(resultSource, /lunarTimeText/)
+  assert.match(resultSource, /formatLunarTimeText/)
+  assert.match(resultSource, /symbolTone/)
+  assert.match(resultSource, /handleToggleCardFace/)
+  for (const symbol of ['大安', '留连', '速喜', '赤口', '小吉', '空亡']) {
+    assert.match(resultSource, new RegExp(symbol))
+  }
+
+  assert.match(resultStyles, /rotateY/)
+  assert.match(resultStyles, /backface-visibility/)
+  assert.match(resultStyles, /\.result-page\s*{[\s\S]*padding: 20rpx 16rpx 48rpx;/)
+  assert.match(resultStyles, /\.result-card-shell\s*{[\s\S]*width: 100%;[\s\S]*height: 78vh;[\s\S]*min-height: 820rpx;/)
+  assert.match(resultStyles, /\.card-face\s*{[\s\S]*padding: 44rpx 42rpx;/)
+  assert.match(resultStyles, /\.front-content\s*{[\s\S]*position: absolute;[\s\S]*top: 50%;[\s\S]*left: 50%;[\s\S]*transform: translate\(-50%, -50%\);/)
+  assert.match(resultStyles, /\.result-symbol\s*{[\s\S]*flex-direction: column;[\s\S]*gap: 28rpx;/)
+  assert.match(resultStyles, /\.result-lunar-time\s*{[\s\S]*position: absolute;[\s\S]*bottom: 52rpx;[\s\S]*text-align: center;/)
+  for (const toneClass of ['tone-da-an', 'tone-liu-lian', 'tone-su-xi', 'tone-chi-kou', 'tone-xiao-ji', 'tone-kong-wang']) {
+    assert.match(resultStyles, new RegExp(`\\.${toneClass} \\.card-front`))
+  }
+})
+
+test('ritual page teaches how to ask before showing the result', async () => {
+  const ritualMarkup = await readText('../pages/xiao-liuren/index.wxml')
+
+  assert.match(ritualMarkup, /请在心中默问一件小事，一个方向。/)
+  assert.match(ritualMarkup, /宜问：这件事今天推进，是否合适？/)
+  assert.match(ritualMarkup, /不宜问：我应该怎么办？/)
+  assert.match(ritualMarkup, /不以玩笑试探，不反复追问同一事。/)
+})
+
+test('ritual page starts divination instead of asking user to view result', async () => {
+  const ritualMarkup = await readText('../pages/xiao-liuren/index.wxml')
+
+  assert.match(ritualMarkup, /{{isDivining \? '起课中' : '起念'}}/)
+  assert.match(ritualMarkup, /起课中/)
+  assert.doesNotMatch(ritualMarkup, /起念中/)
+  assert.doesNotMatch(ritualMarkup, /解卦中/)
+  assert.doesNotMatch(ritualMarkup, /开始起念/)
+  assert.doesNotMatch(ritualMarkup, /<view class="inner">问<\/view>/)
+  assert.doesNotMatch(ritualMarkup, /查看结果/)
+})
+
+test('ritual page shows a center spinning wait state before auto navigating', async () => {
+  const ritualMarkup = await readText('../pages/xiao-liuren/index.wxml')
+  const ritualStyles = await readText('../pages/xiao-liuren/index.wxss')
+  const ritualSource = await readText('../pages/xiao-liuren/index.ts')
+
+  assert.match(ritualMarkup, /spinning-ring/)
+  assert.doesNotMatch(ritualMarkup, /liuren-hand/)
+  assert.doesNotMatch(ritualMarkup, /handPalaces/)
+  assert.doesNotMatch(ritualMarkup, /hand-palace/)
+  assert.doesNotMatch(ritualMarkup, /palace-name/)
+  assert.doesNotMatch(ritualMarkup, /palace-number/)
+  assert.doesNotMatch(ritualMarkup, /大安|留连|速喜|赤口|小吉|空亡/)
+  assert.doesNotMatch(ritualSource, /LIUREN_HAND_PALACES/)
+  assert.doesNotMatch(ritualSource, /activePalaceIndex/)
+  assert.match(ritualStyles, /@keyframes spin/)
+  assert.match(ritualStyles, /\.ritual-action\.active\s*{[\s\S]*width: 336rpx;[\s\S]*height: 336rpx;/)
+  assert.match(ritualStyles, /\.active \.spinning-ring\s*{[\s\S]*width: 328rpx;[\s\S]*height: 328rpx;/)
+  assert.doesNotMatch(ritualStyles, /liuren-hand/)
+  assert.doesNotMatch(ritualStyles, /hand-palace/)
+  assert.doesNotMatch(ritualStyles, /palacePulse/)
+  assert.match(ritualSource, /buildXiaoLiurenCountPath/)
+  assert.match(ritualSource, /ANIMATION_STEP_MS/)
+  assert.match(ritualSource, /runCountAnimation/)
+  assert.doesNotMatch(ritualSource, /}, 1200\)/)
+  assert.match(ritualSource, /isDivining/)
+  assert.match(ritualSource, /setTimeout/)
+  assert.match(
+    ritualSource,
+    /this\.runCountAnimation\(countPath, \(\) => \{[\s\S]*this\.setData\(\{ isDivining: false \}\)[\s\S]*wx\.navigateTo\(\{ url: '\/pages\/result\/index' \}\)/
+  )
+  assert.match(ritualSource, /\/pages\/result\/index/)
+})
+
+test('ritual page guards against asking more than three times per day', async () => {
+  const ritualSource = await readText('../pages/xiao-liuren/index.ts')
+
+  assert.match(ritualSource, /canStartDailyDivination/)
+  assert.match(ritualSource, /recordDailyDivination/)
+  assert.match(ritualSource, /今日三问已满/)
+})
+
+test('result disclaimer stays short and does not explain the calculation', async () => {
+  const templatesSource = await readText('../domain/interpretation/templates.ts')
+
+  assert.match(templatesSource, /仅供传统文化体验与自我参考。/)
+  assert.doesNotMatch(templatesSource, /不作为现实决策的唯一依据/)
+})

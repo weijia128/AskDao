@@ -61,6 +61,19 @@ export function getChineseHour(hour) {
   }
 }
 
+export function buildXiaoLiurenCountPath(input) {
+  const { lunarMonth, lunarDay, hourIndex } = input
+
+  for (const [key, value] of Object.entries({ lunarMonth, lunarDay, hourIndex })) {
+    if (!Number.isInteger(value) || value <= 0) {
+      throw new Error(`Invalid ${key}: ${value}`)
+    }
+  }
+
+  const totalSteps = lunarMonth + lunarDay + hourIndex - 2
+  return Array.from({ length: totalSteps }, (_, index) => index % 6)
+}
+
 export function calculateXiaoLiuren(input) {
   const { lunarMonth, lunarDay, hourIndex, hourBranch, createdAt } = input
 

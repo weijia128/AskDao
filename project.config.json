@@ -2,7 +2,7 @@
   "description": "AskDao WeChat Mini Program",
   "compileType": "miniprogram",
   "miniprogramRoot": "miniprogram/",
-  "appid": "touristappid",
+  "appid": "wx506143882f7eb038",
   "projectname": "AskDao",
   "setting": {
     "urlCheck": true,
@@ -10,7 +10,38 @@
     "enhance": true,
     "postcss": true,
     "minified": true,
-    "compileHotReLoad": true
+    "compileHotReLoad": true,
+    "compileWorklet": false,
+    "uglifyFileName": false,
+    "uploadWithSourceMap": true,
+    "packNpmManually": true,
+    "packNpmRelationList": [
+      {
+        "packageJsonPath": "./package.json",
+        "miniprogramNpmDistDir": "./miniprogram/"
+      }
+    ],
+    "minifyWXSS": true,
+    "minifyWXML": true,
+    "localPlugins": false,
+    "disableUseStrict": false,
+    "useCompilerPlugins": [
+      "typescript"
+    ],
+    "condition": false,
+    "swc": false,
+    "disableSWC": true,
+    "babelSetting": {
+      "ignore": [],
+      "disablePlugins": [],
+      "outputPath": ""
+    }
   },
-  "condition": {}
+  "condition": {},
+  "simulatorPluginLibVersion": {},
+  "packOptions": {
+    "ignore": [],
+    "include": []
+  },
+  "editorSetting": {}
 }

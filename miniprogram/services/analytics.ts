@@ -7,6 +7,7 @@ export type AnalyticsEvent =
   | 'complete_divination'
   | 'view_result'
   | 'save_poster'
+  | 'save_thought_note'
   | 'share_click'
   | 'reopen_from_share'
   | 'view_history'

@@ -5,21 +5,82 @@
   justify-content: center;
 }
 
-.circle {
+.ritual-action {
+  position: relative;
   display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 336rpx;
+  height: 336rpx;
+  transition: width 0.2s ease, height 0.2s ease;
+}
+
+.ritual-action.active {
+  width: 336rpx;
+  height: 336rpx;
+}
+
+.spinning-ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 328rpx;
+  height: 328rpx;
+  margin-left: -164rpx;
+  margin-top: -164rpx;
+  border: 4rpx solid rgba(216, 174, 103, 0.14);
+  border-top-color: #f3db9a;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  z-index: 3;
+}
+
+.active .spinning-ring {
+  width: 328rpx;
+  height: 328rpx;
+  margin-left: -164rpx;
+  margin-top: -164rpx;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.circle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   width: 280rpx;
   height: 280rpx;
+  margin-left: -140rpx;
+  margin-top: -140rpx;
   border: 2rpx solid rgba(216, 174, 103, 0.48);
   border-radius: 50%;
   box-shadow: 0 0 80rpx rgba(216, 174, 103, 0.18);
+  transition: width 0.2s ease, height 0.2s ease, margin 0.2s ease;
+  z-index: 4;
 }
 
 .inner {
   color: #d8ae67;
-  font-size: 96rpx;
+  font-size: 58rpx;
   font-family: "Songti SC", serif;
+  letter-spacing: 0;
+}
+
+.active .circle {
+  border-color: rgba(243, 219, 154, 0.78);
+  box-shadow: 0 0 96rpx rgba(216, 174, 103, 0.28);
 }
 
 .title {
@@ -32,6 +93,26 @@
   margin-top: 16rpx;
   color: rgba(246, 239, 226, 0.6);
   font-size: 26rpx;
+}
+
+.guidance {
+  width: 82%;
+  margin-top: 32rpx;
+  color: rgba(246, 239, 226, 0.72);
+  font-size: 26rpx;
+  line-height: 1.6;
+  text-align: center;
+}
+
+.guidance-line {
+  margin-top: 14rpx;
+  color: rgba(243, 219, 154, 0.86);
+}
+
+.guidance-note {
+  margin-top: 18rpx;
+  color: rgba(246, 239, 226, 0.54);
+  font-size: 24rpx;
 }
 
 .primary-button {

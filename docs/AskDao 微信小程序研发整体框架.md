@@ -69,11 +69,11 @@ Analytics
 负责用户可见页面和交互：
 
 - 今日问道首页。
-- 问题分类页或弹层。
 - 小六壬推演页。
 - 结果页。
 - 分享卡片生成页或组件。
 - 历史记录页。
+- 问事方向选择页或弹层可作为 V1 可选增强，不进入 MVP 0.1 主流程。
 
 ### Application Service
 
@@ -81,7 +81,8 @@ Analytics
 
 职责：
 
-- 收集问题类型、可选输入、起念时间和来源。
+- 收集起念时间和来源。
+- 问题类型首版使用默认值，可选输入后续再接入。
 - 调用输入风险检测。
 - 调用小六壬规则层。
 - 调用解读 Provider。
@@ -162,11 +163,6 @@ AskDao/
     app.wxss
     pages/
       home/
-        index.ts
-        index.wxml
-        index.wxss
-        index.json
-      question/
         index.ts
         index.wxml
         index.wxss
@@ -495,10 +491,9 @@ Rule Engine    Prompt/Template  Profile/History
 | page_view | 进入页面 | page, source, scene |
 | view_daily_ritual | 看到今日问道模块 | daily_symbol, daily_grade |
 | click_start | 点击开始问道 | entry |
-| select_question_type | 选择问题类型 | question_type |
 | start_divination | 开始小六壬推算 | method |
 | complete_divination | 规则计算完成 | symbol, grade, rule_version |
-| view_result | 查看结果页 | symbol, grade, question_type |
+| view_result | 查看结果页 | symbol, grade |
 | save_poster | 保存分享卡片 | template_id, symbol, grade |
 | share_click | 点击分享入口 | template_id, channel |
 | reopen_from_share | 从分享回流 | template_id, share_scene |
@@ -688,10 +683,10 @@ MVP 0.1 历史记录使用微信小程序本地存储即可。
 - 小六壬规则层。
 - 小六壬固定测试样例。
 - 今日问道首页。
-- 问题分类。
+- 心中默问起念页。
 - 结果页。
 - 一张分享卡片。
-- 轻量风险关键词过滤。
+- 风险过滤接口预留。
 
 不包含：
 
