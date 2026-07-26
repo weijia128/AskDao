@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { readFile, stat } from 'node:fs/promises'
+import { access, readFile, stat } from 'node:fs/promises'
 
 const readJson = async (path) => JSON.parse(await readFile(new URL(path, import.meta.url), 'utf8'))
 
@@ -21,5 +21,31 @@ test('WeChat DevTools compiles TypeScript page entries', async () => {
     const pageScript = new URL(`../${page}.ts`, import.meta.url)
     const file = await stat(pageScript)
     assert.equal(file.isFile(), true)
+  }
+})
+
+test('dead code stays deleted', async () => {
+  const deletedPaths = [
+    '../pages/question/index.ts',
+    '../services/poster.ts',
+    '../application/result-service.ts',
+    '../assets/images/liuren-hand.png',
+    '../design/tokens.ts',
+    '../design/copywriting.ts',
+    '../components/ritual-button/index.ts',
+  ]
+
+  for (const path of deletedPaths) {
+    await assert.rejects(access(new URL(path, import.meta.url)))
+  }
+})
+
+test('pages do not register placeholder components', async () => {
+  const appConfig = await readJson('../app.json')
+
+  for (const page of appConfig.pages) {
+    const pageConfig = await readJson(`../${page}.json`)
+    const components = pageConfig.usingComponents || {}
+    assert.deepEqual(Object.keys(components), [])
   }
 })

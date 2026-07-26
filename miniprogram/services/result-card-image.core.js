@@ -1,5 +1,53 @@
 export const RESULT_CARD_BACKGROUND_IMAGE = '/assets/images/result-card-bg.png'
 
+// 小程序码码位（375x560 逻辑坐标，右下角）。
+// 发布后替换为静态太阳码：见 miniprogram/README.md「结果卡小程序码」。
+export const RESULT_CARD_CODE_SLOT = { x: 277, y: 468, size: 56 }
+
+// 保存卡背景色调，与结果页卡面（pages/result/index.wxss 的 .tone-* .card-front）保持一致
+export const RESULT_CARD_TONE_STYLES = {
+  大安: {
+    glow: 'rgba(243, 219, 154, 0.28)',
+    gradientFrom: 'rgba(65, 100, 80, 0.94)',
+    gradientTo: 'rgba(29, 42, 35, 0.96)',
+    border: 'rgba(209, 221, 176, 0.46)',
+  },
+  留连: {
+    glow: 'rgba(227, 191, 119, 0.22)',
+    gradientFrom: 'rgba(102, 93, 78, 0.94)',
+    gradientTo: 'rgba(42, 41, 39, 0.96)',
+    border: 'rgba(216, 174, 103, 0.38)',
+  },
+  速喜: {
+    glow: 'rgba(255, 229, 157, 0.3)',
+    gradientFrom: 'rgba(151, 74, 54, 0.94)',
+    gradientTo: 'rgba(81, 38, 31, 0.96)',
+    border: 'rgba(243, 219, 154, 0.46)',
+  },
+  赤口: {
+    glow: 'rgba(213, 88, 70, 0.26)',
+    gradientFrom: 'rgba(103, 40, 38, 0.94)',
+    gradientTo: 'rgba(40, 24, 24, 0.96)',
+    border: 'rgba(214, 99, 82, 0.44)',
+  },
+  小吉: {
+    glow: 'rgba(243, 219, 154, 0.24)',
+    gradientFrom: 'rgba(62, 111, 99, 0.94)',
+    gradientTo: 'rgba(28, 49, 46, 0.96)',
+    border: 'rgba(174, 217, 199, 0.42)',
+  },
+  空亡: {
+    glow: 'rgba(214, 167, 92, 0.18)',
+    gradientFrom: 'rgba(59, 65, 70, 0.94)',
+    gradientTo: 'rgba(17, 20, 22, 0.96)',
+    border: 'rgba(196, 201, 202, 0.3)',
+  },
+}
+
+export function getResultCardToneStyle(symbol) {
+  return RESULT_CARD_TONE_STYLES[symbol] || RESULT_CARD_TONE_STYLES['空亡']
+}
+
 export function wrapPosterText(text = '', maxLength = 12) {
   const chars = Array.from(`${text}`)
   const lines = []
@@ -70,15 +118,6 @@ export function formatLunarTimeText(inputSnapshot = {}) {
   return `农历${monthText}月${dayText} · ${hourBranch}时`
 }
 
-function normalizeWatermarkName(watermarkName = '') {
-  const name = `${watermarkName}`.trim()
-  if (!name) {
-    return '问道人'
-  }
-
-  return Array.from(name).slice(0, 10).join('')
-}
-
 export function splitResultSymbol(symbol = '') {
   return Array.from(`${symbol}`.trim()).filter(Boolean)
 }
@@ -98,14 +137,16 @@ export function getVerticalSymbolLayout(symbolChars = [], options = {}) {
   }))
 }
 
-export function buildResultCardImageModel(record, watermarkName = '') {
+export function buildResultCardImageModel(record) {
   const symbol = record?.rule_result?.symbol || ''
 
   return {
     brand: '问道',
     methodName: '小六壬',
     backgroundImagePath: RESULT_CARD_BACKGROUND_IMAGE,
-    watermarkName: normalizeWatermarkName(watermarkName),
+    signature: '问道人 起念',
+    miniProgramCodeUrl: record?.mini_program_code_url || '',
+    toneStyle: getResultCardToneStyle(symbol),
     symbol,
     symbolChars: splitResultSymbol(symbol),
     grade: record?.rule_result?.grade || '',

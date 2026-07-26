@@ -1,9 +1,0 @@
-.ritual-button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 88rpx;
-  color: #17110a;
-  background: #d8ae67;
-  border-radius: 999rpx;
-}

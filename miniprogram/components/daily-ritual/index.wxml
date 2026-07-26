@@ -1,3 +1,0 @@
-<view class="daily-ritual">
-  <slot />
-</view>

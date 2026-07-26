@@ -29,9 +29,13 @@
 
   <view class="thought-entry" wx:if="{{record && !showThoughtNoteCard}}">
     <view class="thought-saved-summary" wx:if="{{record.thought_note}}">此念：{{record.thought_note}}</view>
-    <view class="secondary-button thought-trigger" bindtap="handleOpenThoughtNote">
-      <block wx:if="{{record.thought_note}}">修改此念</block>
-      <block wx:else>记下此念</block>
+    <view class="quick-links">
+      <view class="link-item" bindtap="handleOpenThoughtNote">
+        <block wx:if="{{record.thought_note}}">修改此念</block>
+        <block wx:else>记下此念</block>
+      </view>
+      <view class="link-divider"></view>
+      <view class="link-item" bindtap="handleOpenHistory">问道记录</view>
     </view>
   </view>
 
@@ -52,7 +56,6 @@
   </view>
 
   <view class="actions" wx:if="{{record}}">
-    <view class="secondary-button history-button" bindtap="handleOpenHistory">查看问道记录</view>
     <view class="primary-button share-button" bindtap="handleShareResultCard">
       <block wx:if="{{isBuildingCard}}">生成中</block>
       <block wx:else>分享断课卡片</block>

@@ -92,6 +92,31 @@ test('history page shows generated time and supports swipe deletion', async () =
   assert.doesNotMatch(historyStyles, /background: rgba\(134, 42, 36/)
 })
 
+test('history page supports clearing all records with confirmation', async () => {
+  const historyMarkup = await readText('../pages/history/index.wxml')
+  const historySource = await readText('../pages/history/index.ts')
+  const storageSource = await readText('../services/storage.ts')
+
+  assert.match(historyMarkup, /clear-all-button/)
+  assert.match(historyMarkup, /handleClearAllRecords/)
+  assert.match(historyMarkup, /清除全部记录/)
+
+  assert.match(historySource, /wx\.showModal/)
+  assert.match(historySource, /clearHistoryRecords/)
+  assert.match(historySource, /clear_history/)
+  assert.match(historySource, /删除后不可恢复/)
+
+  assert.match(storageSource, /wx\.removeStorageSync/)
+})
+
+test('result page does not collect user profile information', async () => {
+  const resultSource = await readText('../pages/result/index.ts')
+
+  assert.doesNotMatch(resultSource, /getUserProfile/)
+  assert.doesNotMatch(resultSource, /getUserInfo/)
+  assert.doesNotMatch(resultSource, /nickName/)
+})
+
 test('result page shares the generated result card image instead of the app entry', async () => {
   const resultMarkup = await readText('../pages/result/index.wxml')
   const resultSource = await readText('../pages/result/index.ts')
@@ -101,8 +126,11 @@ test('result page shares the generated result card image instead of the app entr
   assert.match(resultMarkup, /保存卡片/)
   assert.match(resultMarkup, /resultCardCanvas/)
   assert.match(resultMarkup, />分享断课卡片</)
+  assert.match(resultMarkup, /quick-links/)
+  assert.match(resultMarkup, /link-item/)
+  assert.match(resultMarkup, /问道记录/)
   assert.doesNotMatch(resultMarkup, /open-type="share"/)
-  assert.doesNotMatch(resultMarkup, />转发给好友</)
+  assert.doesNotMatch(resultMarkup, /share-forward-button/)
   assert.doesNotMatch(resultMarkup, /保存分享卡片/)
 
   assert.match(resultSource, /wx\.showShareImageMenu/)
@@ -113,7 +141,17 @@ test('result page shares the generated result card image instead of the app entr
   assert.match(resultSource, /needShowEntrance: true/)
   assert.match(resultSource, /entrancePath/)
 
+  assert.match(resultSource, /onShareAppMessage/)
+  assert.match(resultSource, /onShareTimeline/)
+  assert.match(resultSource, /buildSharePath/)
+  assert.match(resultSource, /buildShareTimelineQuery/)
+  assert.match(resultSource, /channel: 'session'/)
+  assert.match(resultSource, /channel: 'timeline'/)
+  assert.match(resultSource, /channel: 'image_menu'/)
+
   assert.match(shareSource, /buildResultCardEntrancePath/)
+  assert.match(shareSource, /buildShareTimelineQuery/)
+  assert.match(shareSource, /share_scene=timeline/)
   assert.doesNotMatch(shareSource, /thought_note/)
 })
 
@@ -142,7 +180,7 @@ test('home and result pages expose history entry points', async () => {
   assert.match(homeMarkup, /问道记录/)
   assert.match(homeMarkup, /handleOpenHistory/)
   assert.match(homeSource, /\/pages\/history\/index/)
-  assert.match(resultMarkup, /查看问道记录/)
+  assert.match(resultMarkup, /问道记录/)
   assert.match(resultMarkup, /handleOpenHistory/)
   assert.match(resultSource, /\/pages\/history\/index/)
 })

@@ -1,6 +1,17 @@
 import { track } from '../../services/analytics'
+import { buildShareReopenProperties } from '../../services/analytics.core'
 import { getDailyDivinationUsage } from '../../services/daily-limit.core'
 import { getDailyAlmanac } from '../../domain/calendar/almanac'
+
+function getEnterScene() {
+  try {
+    return typeof wx.getEnterOptionsSync === 'function'
+      ? wx.getEnterOptionsSync()?.scene
+      : undefined
+  } catch (error) {
+    return undefined
+  }
+}
 
 const emptyAlmanac = {
   source: '',
@@ -39,6 +50,11 @@ Page({
     this.refreshAlmanac()
     this.refreshDailyLimit()
     track('page_view', { page: 'home', source: options?.source || 'direct' })
+
+    const reopenProperties = buildShareReopenProperties(options, getEnterScene())
+    if (reopenProperties) {
+      track('reopen_from_share', reopenProperties)
+    }
   },
 
   onShow() {

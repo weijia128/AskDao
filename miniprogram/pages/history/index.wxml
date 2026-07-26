@@ -21,4 +21,10 @@
       </view>
     </view>
   </view>
+
+  <view
+    class="clear-all-button"
+    wx:if="{{records.length}}"
+    bindtap="handleClearAllRecords"
+  >清除全部记录</view>
 </view>

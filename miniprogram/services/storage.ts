@@ -11,7 +11,7 @@ export function saveHistoryRecord<T>(record: T): void {
   wx.setStorageSync(HISTORY_KEY, [record, ...records].slice(0, 20))
 }
 
-export function updateHistoryRecord<T extends { id: string }>(recordId: string, patch: Partial<T>): T[] {
+export function updateHistoryRecord<T extends { id: string }>(recordId: string, patch: Partial<T> & Record<string, unknown>): T[] {
   const records = getHistoryRecords<T>()
   const nextRecords = applyHistoryRecordPatch(records, recordId, patch)
   wx.setStorageSync(HISTORY_KEY, nextRecords)
@@ -23,6 +23,10 @@ export function deleteHistoryRecord<T extends { id: string }>(recordId: string):
   const nextRecords = removeHistoryRecord(records, recordId)
   wx.setStorageSync(HISTORY_KEY, nextRecords)
   return nextRecords
+}
+
+export function clearHistoryRecords(): void {
+  wx.removeStorageSync(HISTORY_KEY)
 }
 
 export { formatHistoryCreatedAt }

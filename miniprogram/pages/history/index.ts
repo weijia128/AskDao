@@ -1,5 +1,10 @@
 import { track } from '../../services/analytics'
-import { deleteHistoryRecord, formatHistoryCreatedAt, getHistoryRecords } from '../../services/storage'
+import {
+  clearHistoryRecords,
+  deleteHistoryRecord,
+  formatHistoryCreatedAt,
+  getHistoryRecords,
+} from '../../services/storage'
 
 const SWIPE_OPEN_THRESHOLD = 48
 const SWIPE_CLOSE_THRESHOLD = 24
@@ -74,5 +79,34 @@ Page({
       touchRecordId: '',
     })
     wx.showToast({ title: '已删除', icon: 'success' })
+  },
+
+  handleClearAllRecords() {
+    const count = this.data.records.length
+    if (!count) {
+      return
+    }
+
+    wx.showModal({
+      title: '清除全部记录',
+      content: '将删除本机保存的全部问道记录（含此念笔记），删除后不可恢复。',
+      confirmText: '全部清除',
+      confirmColor: '#8f2e25',
+      success: (res) => {
+        if (!res.confirm) {
+          return
+        }
+
+        clearHistoryRecords()
+        this.setData({
+          records: [],
+          openedRecordId: '',
+          touchStartX: 0,
+          touchRecordId: '',
+        })
+        track('clear_history', { count })
+        wx.showToast({ title: '已清除', icon: 'success' })
+      },
+    })
   },
 })

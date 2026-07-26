@@ -1,6 +1,0 @@
-.ambient-background {
-  min-height: 100%;
-  background:
-    radial-gradient(circle at 82% 16%, rgba(216, 174, 103, 0.16), transparent 28%),
-    radial-gradient(circle at 10% 70%, rgba(169, 61, 47, 0.12), transparent 30%);
-}
