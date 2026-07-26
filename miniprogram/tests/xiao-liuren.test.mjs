@@ -3,6 +3,7 @@ import assert from 'node:assert/strict'
 
 import {
   XIAO_LIUREN_COUNT_SEQUENCE,
+  buildCountStepDelays,
   buildXiaoLiurenCountPath,
   calculateXiaoLiuren,
   getChineseHour,
@@ -60,6 +61,29 @@ test('builds hand counting path from the same month day hour formula', () => {
   assert.equal(path.length, 31)
   assert.deepEqual(path.slice(0, 8), [0, 1, 2, 3, 4, 5, 0, 1])
   assert.equal(path[path.length - 1], 0)
+})
+
+test('count step delays slow down towards the final palace within a bounded duration', () => {
+  const delays = buildCountStepDelays(31)
+
+  assert.equal(delays.length, 31)
+  assert.ok(delays.every((delay) => delay >= 1))
+
+  const total = delays.reduce((sum, delay) => sum + delay, 0)
+  assert.ok(total >= 3000 && total <= 3800, `total ${total}ms out of expected range`)
+
+  assert.ok(delays[delays.length - 1] > delays[0] * 2, 'final step should be much slower than first')
+  assert.ok(delays[delays.length - 1] >= delays[delays.length - 2], 'pace should not speed up at the end')
+})
+
+test('count step delays stay usable for very few and very many steps', () => {
+  const few = buildCountStepDelays(1)
+  assert.equal(few.length, 1)
+  assert.ok(few[0] >= 500)
+
+  const many = buildCountStepDelays(52)
+  const total = many.reduce((sum, delay) => sum + delay, 0)
+  assert.ok(total <= 3800, `total ${total}ms should stay bounded`)
 })
 
 test('hand counting path lands on 空亡 when the rule remainder is 0', () => {

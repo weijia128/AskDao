@@ -78,6 +78,17 @@ export function buildXiaoLiurenCountPath(input) {
   return Array.from({ length: totalSteps }, (_, index) => index % 6)
 }
 
+// 数课动画每步间隔（毫秒）：前快后慢，末几步放慢制造「落宫」感。
+// 总时长随步数自适应，约 0.9-3.4 秒。
+export function buildCountStepDelays(totalSteps) {
+  const steps = Math.max(Math.floor(totalSteps), 1)
+  const targetTotal = Math.min(Math.max(steps * 150, 900), 3400)
+  const weights = Array.from({ length: steps }, (_, index) => 1 + Math.pow(index / steps, 2) * 2.5)
+  const weightSum = weights.reduce((sum, weight) => sum + weight, 0)
+
+  return weights.map((weight) => Math.max(Math.round((weight / weightSum) * targetTotal), 1))
+}
+
 export function calculateXiaoLiuren(input) {
   const { lunarMonth, lunarDay, hourIndex, hourBranch, createdAt } = input
 

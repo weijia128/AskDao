@@ -1,8 +1,8 @@
 export const RESULT_CARD_BACKGROUND_IMAGE = '/assets/images/result-card-bg.png'
 
-// 小程序码码位（375x560 逻辑坐标，右下角）。
+// 小程序码码位（375x560 逻辑坐标，右下角，避开内框线）。
 // 发布后替换为静态太阳码：见 miniprogram/README.md「结果卡小程序码」。
-export const RESULT_CARD_CODE_SLOT = { x: 277, y: 468, size: 56 }
+export const RESULT_CARD_CODE_SLOT = { x: 265, y: 438, size: 56 }
 
 // 保存卡背景色调，与结果页卡面（pages/result/index.wxss 的 .tone-* .card-front）保持一致
 export const RESULT_CARD_TONE_STYLES = {
@@ -144,7 +144,6 @@ export function buildResultCardImageModel(record) {
     brand: '问道',
     methodName: '小六壬',
     backgroundImagePath: RESULT_CARD_BACKGROUND_IMAGE,
-    signature: '问道人 起念',
     miniProgramCodeUrl: record?.mini_program_code_url || '',
     toneStyle: getResultCardToneStyle(symbol),
     symbol,

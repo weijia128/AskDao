@@ -43,6 +43,7 @@ Page({
     symbolTone: '',
     symbolChars: [],
     lunarTimeText: '',
+    keyboardHeight: 0,
   },
 
   onLoad() {
@@ -56,7 +57,14 @@ Page({
       symbolTone: getSymbolTone(record),
       symbolChars: splitResultSymbol(record?.rule_result?.symbol),
       lunarTimeText: formatLunarTimeText(record?.rule_result?.input_snapshot),
+      keyboardHeight: 0,
     })
+
+    if (typeof wx.onKeyboardHeightChange === 'function') {
+      wx.onKeyboardHeightChange((res) => {
+        this.setData({ keyboardHeight: res?.height || 0 })
+      })
+    }
     track('page_view', { page: 'result' })
     if (record) {
       track('view_result', {
@@ -79,11 +87,7 @@ Page({
     wx.navigateTo({ url: '/pages/history/index' })
   },
 
-  drawResultCardImage() {
-    const model = buildResultCardImageModel(this.data.record)
-    const toneStyle = model.toneStyle
-    const ctx = wx.createCanvasContext(RESULT_CARD_CANVAS_ID, this)
-
+  drawCardBackground(ctx, toneStyle) {
     // 背景与 App 卡面一致：六象色调线性渐变 + 中部径向光晕
     const background = ctx.createLinearGradient(0, 0, RESULT_CARD_WIDTH * 0.6, RESULT_CARD_HEIGHT * 0.85)
     background.addColorStop(0, toneStyle.gradientFrom)
@@ -107,7 +111,10 @@ Page({
 
     ctx.setStrokeStyle('rgba(255, 246, 216, 0.14)')
     ctx.strokeRect(38, 44, RESULT_CARD_WIDTH - 76, RESULT_CARD_HEIGHT - 88)
+  },
 
+  drawCardChrome(ctx, model) {
+    // 正背面共用：品牌、方法、印章、码位、免责声明
     ctx.setFillStyle('rgba(255, 246, 216, 0.92)')
     ctx.setFontSize(20)
     ctx.fillText(model.brand, 48, 72)
@@ -116,56 +123,12 @@ Page({
     ctx.setFontSize(15)
     ctx.fillText(`${model.methodName} · ${model.symbol}`, 48, 106)
 
-    ctx.setFillStyle('#fff6d8')
-    ctx.setFontSize(76)
-    ctx.fillText(model.grade, 48, 194)
-
-    ctx.setFillStyle('rgba(243, 219, 154, 0.92)')
-    ctx.setFontSize(30)
-    getVerticalSymbolLayout(model.symbolChars, {
-      centerY: 184,
-      fontSize: 30,
-      gap: 18,
-    }).forEach((item) => {
-      ctx.fillText(item.char, 136, item.y)
-    })
-
-    ctx.setFillStyle('rgba(255, 246, 216, 0.6)')
-    ctx.setFontSize(14)
-    ctx.setTextAlign('center')
-    ctx.fillText(model.lunarTimeText, RESULT_CARD_WIDTH / 2, RESULT_CARD_HEIGHT - 54)
-    ctx.setTextAlign('left')
-
-    ctx.setFillStyle('rgba(255, 246, 216, 0.85)')
-    ctx.setFontSize(15)
-    wrapPosterText(model.oracleText, 16).slice(0, 3).forEach((line, index) => {
-      ctx.fillText(line, 48, 276 + index * 26)
-    })
-
-    ctx.setFillStyle('rgba(255, 246, 216, 0.62)')
-    ctx.setFontSize(14)
-    wrapPosterText(model.actionHint, 18).slice(0, 3).forEach((line, index) => {
-      ctx.fillText(line, 48, 356 + index * 24)
-    })
-
     ctx.setStrokeStyle('rgba(214, 99, 82, 0.8)')
     ctx.strokeRect(286, 56, 42, 42)
     ctx.setFillStyle('rgba(224, 122, 102, 0.95)')
     ctx.setFontSize(14)
     ctx.fillText('问', 293, 74)
     ctx.fillText('道', 293, 94)
-
-    ctx.setFillStyle('rgba(224, 122, 102, 0.85)')
-    ctx.setFontSize(13)
-    ctx.fillText(model.signature, 220, 442)
-
-    ctx.setFillStyle('rgba(255, 246, 216, 0.55)')
-    ctx.setFontSize(13)
-    ctx.fillText(model.createdAtText, 48, 466)
-
-    ctx.setFillStyle('rgba(255, 246, 216, 0.4)')
-    ctx.setFontSize(12)
-    ctx.fillText(model.disclaimer, 48, 536)
 
     if (model.miniProgramCodeUrl) {
       ctx.drawImage(
@@ -190,6 +153,82 @@ Page({
       ctx.fillText('道', RESULT_CARD_CODE_SLOT.x + 21, RESULT_CARD_CODE_SLOT.y + 42)
     }
 
+    ctx.setFillStyle('rgba(255, 246, 216, 0.4)')
+    ctx.setFontSize(11)
+    ctx.setTextAlign('center')
+    ctx.fillText(model.disclaimer, RESULT_CARD_WIDTH / 2, 548)
+    ctx.setTextAlign('left')
+  },
+
+  drawFrontFace(ctx, model) {
+    // 正面：宫位大字竖排居中 + 农历时辰，与 App 卡面一致
+    ctx.setFillStyle('#fff6d8')
+    ctx.setFontSize(104)
+    ctx.setTextAlign('center')
+    getVerticalSymbolLayout(model.symbolChars, {
+      centerY: 290,
+      fontSize: 104,
+      gap: 26,
+    }).forEach((item) => {
+      ctx.fillText(item.char, RESULT_CARD_WIDTH / 2, item.y)
+    })
+
+    ctx.setFillStyle('rgba(255, 246, 216, 0.6)')
+    ctx.setFontSize(14)
+    ctx.fillText(model.lunarTimeText, RESULT_CARD_WIDTH / 2, 496)
+    ctx.setTextAlign('left')
+  },
+
+  drawBackFace(ctx, model) {
+    // 背面：档位 + 竖排宫位 + 签语 + 行动提示 + 起念时间
+    ctx.setFillStyle('#fff6d8')
+    ctx.setFontSize(76)
+    ctx.fillText(model.grade, 48, 194)
+
+    ctx.setFillStyle('rgba(243, 219, 154, 0.92)')
+    ctx.setFontSize(30)
+    getVerticalSymbolLayout(model.symbolChars, {
+      centerY: 184,
+      fontSize: 30,
+      gap: 18,
+    }).forEach((item) => {
+      ctx.fillText(item.char, 136, item.y)
+    })
+
+    ctx.setFillStyle('rgba(255, 246, 216, 0.85)')
+    ctx.setFontSize(15)
+    wrapPosterText(model.oracleText, 16).slice(0, 3).forEach((line, index) => {
+      ctx.fillText(line, 48, 276 + index * 26)
+    })
+
+    ctx.setFillStyle('rgba(255, 246, 216, 0.62)')
+    ctx.setFontSize(14)
+    wrapPosterText(model.actionHint, 18).slice(0, 3).forEach((line, index) => {
+      ctx.fillText(line, 48, 356 + index * 24)
+    })
+
+    ctx.setFillStyle('rgba(255, 246, 216, 0.55)')
+    ctx.setFontSize(13)
+    ctx.fillText(model.createdAtText, 48, 470)
+
+    ctx.setFillStyle('rgba(255, 246, 216, 0.6)')
+    ctx.setFontSize(14)
+    ctx.fillText(model.lunarTimeText, 48, 496)
+  },
+
+  drawResultCardImage(face = 'back') {
+    const model = buildResultCardImageModel(this.data.record)
+    const ctx = wx.createCanvasContext(RESULT_CARD_CANVAS_ID, this)
+
+    this.drawCardBackground(ctx, model.toneStyle)
+    this.drawCardChrome(ctx, model)
+
+    if (face === 'front') {
+      this.drawFrontFace(ctx, model)
+    } else {
+      this.drawBackFace(ctx, model)
+    }
+
     return new Promise((resolve, reject) => {
       ctx.draw(false, () => {
         wx.canvasToTempFilePath(
@@ -202,7 +241,7 @@ Page({
             fileType: 'jpg',
             quality: 0.92,
             success: (res) => {
-              this.cardImagePath = res.tempFilePath
+              this.cardImagePaths = { ...this.cardImagePaths, [face]: res.tempFilePath }
               resolve(res.tempFilePath)
             },
             fail: reject,
@@ -213,12 +252,13 @@ Page({
     })
   },
 
-  getResultCardImagePath() {
-    if (this.cardImagePath) {
-      return Promise.resolve(this.cardImagePath)
+  getResultCardImagePath(face) {
+    const cached = this.cardImagePaths?.[face]
+    if (cached) {
+      return Promise.resolve(cached)
     }
 
-    return this.drawResultCardImage()
+    return this.drawResultCardImage(face)
   },
 
   onShareAppMessage() {
@@ -234,7 +274,7 @@ Page({
     return {
       title: `小六壬断课 · ${record?.rule_result?.symbol || '问道'} · ${record?.rule_result?.grade || ''}`,
       path: buildSharePath(templateId),
-      imageUrl: this.cardImagePath || RESULT_CARD_SHARE_FALLBACK_IMAGE,
+      imageUrl: this.cardImagePaths?.back || RESULT_CARD_SHARE_FALLBACK_IMAGE,
     }
   },
 
@@ -251,7 +291,7 @@ Page({
     return {
       title: `小六壬断课 · ${record?.rule_result?.symbol || '问道'} · ${record?.rule_result?.grade || ''}`,
       query: buildShareTimelineQuery(templateId),
-      imageUrl: this.cardImagePath || RESULT_CARD_SHARE_FALLBACK_IMAGE,
+      imageUrl: this.cardImagePaths?.back || RESULT_CARD_SHARE_FALLBACK_IMAGE,
     }
   },
 
@@ -263,9 +303,10 @@ Page({
     this.setData({ isBuildingCard: true })
     const poster = buildSharePosterModel(this.data.record.rule_result, this.data.record.interpretation)
     wx.setStorageSync('askdao_latest_poster', poster)
+    const face = this.data.isCardBackVisible ? 'back' : 'front'
 
     try {
-      const imagePath = await this.getResultCardImagePath()
+      const imagePath = await this.getResultCardImagePath(face)
       wx.saveImageToPhotosAlbum({
         filePath: imagePath,
         success: () => {
@@ -273,6 +314,7 @@ Page({
             template_id: poster.template_id,
             symbol: poster.symbol,
             grade: poster.grade,
+            face,
           })
           wx.showToast({ title: '已保存到相册', icon: 'success' })
         },
@@ -297,7 +339,7 @@ Page({
     this.setData({ isBuildingCard: true })
 
     try {
-      const imagePath = await this.getResultCardImagePath()
+      const imagePath = await this.getResultCardImagePath('back')
       wx.showShareImageMenu({
         path: imagePath,
         needShowEntrance: true,

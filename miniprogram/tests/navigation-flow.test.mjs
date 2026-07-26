@@ -65,6 +65,21 @@ test('result page supports optional post-result thought note', async () => {
   assert.match(historyMarkup, /thought_note/)
 })
 
+test('thought note panel floats above the keyboard', async () => {
+  const resultMarkup = await readText('../pages/result/index.wxml')
+  const resultSource = await readText('../pages/result/index.ts')
+  const resultStyles = await readText('../pages/result/index.wxss')
+
+  assert.match(resultMarkup, /thought-mask/)
+  assert.match(resultMarkup, /keyboardHeight \? keyboardHeight \+ 'px' : '40rpx'/)
+  assert.match(resultMarkup, /adjust-position="\{\{false\}\}"/)
+  assert.match(resultMarkup, /focus="\{\{showThoughtNoteCard\}\}"/)
+  assert.match(resultSource, /wx\.onKeyboardHeightChange/)
+  assert.match(resultSource, /keyboardHeight: 0/)
+  assert.match(resultStyles, /\.thought-note\s*{[\s\S]*position: fixed;/)
+  assert.match(resultStyles, /\.thought-mask/)
+})
+
 test('history page shows generated time and supports swipe deletion', async () => {
   const historyMarkup = await readText('../pages/history/index.wxml')
   const historySource = await readText('../pages/history/index.ts')
@@ -115,6 +130,20 @@ test('result page does not collect user profile information', async () => {
   assert.doesNotMatch(resultSource, /getUserProfile/)
   assert.doesNotMatch(resultSource, /getUserInfo/)
   assert.doesNotMatch(resultSource, /nickName/)
+})
+
+test('result card supports saving both front and back faces', async () => {
+  const resultSource = await readText('../pages/result/index.ts')
+
+  assert.match(resultSource, /drawFrontFace/)
+  assert.match(resultSource, /drawBackFace/)
+  assert.match(resultSource, /drawCardBackground/)
+  assert.match(resultSource, /drawCardChrome/)
+  assert.match(resultSource, /isCardBackVisible \? 'back' : 'front'/)
+  assert.match(resultSource, /cardImagePaths\?\.\[face\]/)
+  assert.match(resultSource, /face,/)
+  assert.match(resultSource, /getResultCardImagePath\('back'\)/)
+  assert.match(resultSource, /cardImagePaths\?\.back/)
 })
 
 test('result page shares the generated result card image instead of the app entry', async () => {
@@ -276,7 +305,7 @@ test('ritual page shows a center spinning wait state before auto navigating', as
   assert.doesNotMatch(ritualStyles, /palacePulse/)
   assert.match(ritualSource, /buildXiaoLiurenCountPath/)
   assert.match(ritualSource, /XIAO_LIUREN_COUNT_SEQUENCE/)
-  assert.match(ritualSource, /ANIMATION_STEP_MS/)
+  assert.match(ritualSource, /buildCountStepDelays/)
   assert.match(ritualSource, /runCountAnimation/)
   assert.doesNotMatch(ritualSource, /}, 1200\)/)
   assert.match(ritualSource, /isDivining/)

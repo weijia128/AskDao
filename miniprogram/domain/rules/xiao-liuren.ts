@@ -2,12 +2,17 @@ import type { RuleResult } from './types'
 
 import {
   XIAO_LIUREN_COUNT_SEQUENCE,
+  buildCountStepDelays as buildCountStepDelaysCore,
   buildXiaoLiurenCountPath as buildCountPathCore,
   calculateXiaoLiuren as calculateCore,
   getChineseHour as getChineseHourCore,
 } from './xiao-liuren.core'
 
 export { XIAO_LIUREN_COUNT_SEQUENCE }
+
+export function buildCountStepDelays(totalSteps: number): number[] {
+  return buildCountStepDelaysCore(totalSteps) as number[]
+}
 
 export interface XiaoLiurenInput {
   lunarMonth: number

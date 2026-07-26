@@ -43,7 +43,6 @@ test('result card image model excludes the private thought note', () => {
   assert.equal(model.createdAtText, '2026-07-24 08:30')
   assert.equal(model.lunarTimeText, '农历七月廿一 · 辰时')
   assert.equal(model.backgroundImagePath, RESULT_CARD_BACKGROUND_IMAGE)
-  assert.equal(model.signature, '问道人 起念')
   assert.equal(model.miniProgramCodeUrl, '')
   assert.deepEqual(Object.keys(model).filter((key) => key.includes('thought')), [])
 })

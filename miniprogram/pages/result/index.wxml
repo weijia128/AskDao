@@ -39,7 +39,12 @@
     </view>
   </view>
 
-  <view class="thought-note glass-card" wx:if="{{record && showThoughtNoteCard}}">
+  <view class="thought-mask" wx:if="{{record && showThoughtNoteCard}}" catchtap="handleCloseThoughtNote"></view>
+  <view
+    class="thought-note glass-card"
+    wx:if="{{record && showThoughtNoteCard}}"
+    style="bottom: {{keyboardHeight ? keyboardHeight + 'px' : '40rpx'}}"
+  >
     <view class="thought-title">记下此念</view>
     <view class="thought-helper">可用一句话记下刚才心中所问，仅用于日后回看，不参与起课。</view>
     <textarea
@@ -47,6 +52,9 @@
       value="{{thoughtNote}}"
       maxlength="60"
       placeholder="例如：这周是否适合推进某件事"
+      focus="{{showThoughtNoteCard}}"
+      adjust-position="{{false}}"
+      cursor-spacing="16"
       bindinput="handleThoughtInput"
     ></textarea>
     <view class="thought-actions">

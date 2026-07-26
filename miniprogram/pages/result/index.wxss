@@ -223,9 +223,24 @@
   background: rgba(216, 174, 103, 0.3);
 }
 
+.thought-mask {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 20;
+  background: rgba(8, 9, 8, 0.56);
+}
+
 .thought-note {
-  margin-top: 28rpx;
+  position: fixed;
+  right: 32rpx;
+  left: 32rpx;
+  bottom: 40rpx;
+  z-index: 21;
   padding: 30rpx;
+  background: rgba(24, 26, 22, 0.96);
 }
 
 .thought-title {

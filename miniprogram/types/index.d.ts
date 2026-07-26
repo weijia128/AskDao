@@ -72,4 +72,5 @@ declare const wx: {
   }): void
   reportAnalytics(eventName: string, data?: Record<string, unknown>): void
   getEnterOptionsSync?(): { scene: number; path?: string; query?: Record<string, string> }
+  onKeyboardHeightChange?(callback: (res: { height: number }) => void): void
 }
