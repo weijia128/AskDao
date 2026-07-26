@@ -1,5 +1,9 @@
 const SYMBOLS = ['空亡', '大安', '留连', '速喜', '赤口', '小吉']
 
+// 起课动画的数数顺序：从大安起数，第 i 步展示 XIAO_LIUREN_COUNT_SEQUENCE[i % 6]，
+// 数完 countPath 全部步数后，末位恰好落在结果宫位上。
+export const XIAO_LIUREN_COUNT_SEQUENCE = ['大安', '留连', '速喜', '赤口', '小吉', '空亡']
+
 const GRADES_BY_SYMBOL = {
   大安: '顺',
   留连: '平',

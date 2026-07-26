@@ -1,12 +1,43 @@
 .home-page {
-  padding-bottom: 56rpx;
+  padding-bottom: 64rpx;
+}
+
+/* 宣纸底：宋人尺牍，无光晕、无投影 */
+.page-shell > view.paper-veil {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  background: linear-gradient(180deg, #f7f2e7 0%, #efe8d7 100%);
+}
+
+.date-header {
+  margin-top: 72rpx;
+  text-align: center;
+}
+
+.date-ganzhi {
+  color: #6b675c;
+  font-size: 26rpx;
+  font-family: "Songti SC", serif;
+  letter-spacing: 6rpx;
+}
+
+.date-lunar {
+  margin-top: 12rpx;
+  color: #9a948a;
+  font-size: 24rpx;
+  letter-spacing: 2rpx;
 }
 
 .hero {
-  position: relative;
   display: flex;
-  justify-content: center;
-  padding-top: 96rpx;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 88rpx;
 }
 
 .taiji-entry {
@@ -17,143 +48,251 @@
 }
 
 .taiji-entry-active {
-  opacity: 0.88;
+  opacity: 0.75;
   transform: scale(0.98);
 }
 
-.bagua-image {
-  width: 360rpx;
-  height: 360rpx;
+.seal-ring {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 300rpx;
+  height: 300rpx;
+  border: 2rpx solid rgba(35, 33, 28, 0.5);
   border-radius: 50%;
-  background: rgba(245, 239, 223, 0.92);
-  box-shadow: 0 24rpx 80rpx rgba(23, 19, 15, 0.18);
+}
+
+.bagua-image {
+  width: 208rpx;
+  height: 208rpx;
+  border-radius: 50%;
 }
 
 .entry-button {
-  min-width: 248rpx;
-  margin-top: 30rpx;
-  padding: 22rpx 44rpx;
-  box-sizing: border-box;
-  color: #f3db9a;
-  background: rgba(17, 16, 14, 0.48);
-  border: 1rpx solid rgba(243, 219, 154, 0.58);
-  border-radius: 999rpx;
-  box-shadow: 0 18rpx 52rpx rgba(0, 0, 0, 0.28);
-  font-size: 36rpx;
+  margin-top: 36rpx;
+  padding-left: 14rpx;
+  color: #23211c;
+  font-size: 44rpx;
   font-family: "Songti SC", serif;
   font-weight: 700;
-  text-align: center;
-  text-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.36);
-}
-
-.ritual-rules {
-  position: relative;
-  margin-top: 52rpx;
-}
-
-.ritual-rule {
-  display: flex;
-  align-items: baseline;
-  justify-content: center;
-  margin-top: 18rpx;
-}
-
-.ritual-rule-title {
-  color: #f6efe2;
-  font-size: 32rpx;
-  font-family: "Songti SC", serif;
-  text-shadow: 0 4rpx 14rpx rgba(0, 0, 0, 0.38);
-}
-
-.ritual-rule-text {
-  margin-left: 20rpx;
-  color: rgba(246, 239, 226, 0.72);
-  font-size: 24rpx;
+  letter-spacing: 14rpx;
 }
 
 .ritual-limit {
-  position: relative;
-  margin-top: 30rpx;
-  color: rgba(246, 239, 226, 0.64);
+  max-width: 560rpx;
+  margin-top: 28rpx;
+  color: #9a948a;
   font-size: 24rpx;
+  line-height: 1.7;
   text-align: center;
-  line-height: 1.55;
 }
 
-.history-entry {
-  position: relative;
-  width: 240rpx;
-  margin: 24rpx auto 0;
-  padding: 18rpx 0;
-  color: #f3db9a;
-  background: rgba(12, 14, 12, 0.32);
-  border: 1rpx solid rgba(243, 219, 154, 0.38);
-  border-radius: 999rpx;
+.rules-panel {
+  margin-top: 96rpx;
+}
+
+.panel-caption {
+  display: flex;
+  align-items: center;
+}
+
+.caption-line {
+  flex: 1;
+  height: 1rpx;
+  background: rgba(35, 33, 28, 0.14);
+}
+
+.caption-text {
+  padding: 0 24rpx;
+  color: #6b675c;
+  font-size: 24rpx;
+  font-family: "Songti SC", serif;
+  letter-spacing: 8rpx;
+}
+
+.rule-row {
+  display: flex;
+  align-items: baseline;
+  margin-top: 30rpx;
+}
+
+.rule-title {
+  flex: 0 0 170rpx;
+  color: #23211c;
+  font-size: 30rpx;
+  font-family: "Songti SC", serif;
+  font-weight: 600;
+}
+
+.rule-text {
+  flex: 1;
+  color: #6b675c;
   font-size: 26rpx;
-  text-align: center;
+  line-height: 1.5;
 }
 
 .almanac-panel {
-  position: relative;
-  margin-top: 56rpx;
-  padding-bottom: 36rpx;
-  color: #f6efe2;
+  margin-top: 84rpx;
 }
 
-.almanac-title {
-  color: #f3db9a;
-  font-size: 32rpx;
-  font-family: "Songti SC", serif;
-}
-
-.almanac-date,
-.almanac-lunar,
 .almanac-meta {
-  margin-top: 14rpx;
-  color: rgba(246, 239, 226, 0.72);
+  margin-top: 26rpx;
+  color: #6b675c;
   font-size: 24rpx;
-  line-height: 1.5;
+  line-height: 1.6;
 }
 
 .almanac-row {
   display: flex;
-  margin-top: 24rpx;
+  align-items: baseline;
+  margin-top: 20rpx;
 }
 
 .almanac-label {
-  flex: 0 0 48rpx;
-  color: #f3db9a;
+  flex: 0 0 56rpx;
+  color: #23211c;
   font-size: 28rpx;
+  font-family: "Songti SC", serif;
   font-weight: 600;
 }
 
 .almanac-label.muted {
-  color: rgba(246, 239, 226, 0.58);
+  color: #9a948a;
 }
 
 .almanac-items {
   flex: 1;
   display: flex;
   flex-wrap: wrap;
-  gap: 12rpx;
 }
 
 .almanac-item {
-  padding: 6rpx 14rpx;
-  color: rgba(246, 239, 226, 0.84);
-  border: 1rpx solid rgba(243, 219, 154, 0.28);
-  border-radius: 999rpx;
-  font-size: 22rpx;
+  margin-right: 24rpx;
+  color: #23211c;
+  font-size: 26rpx;
+  line-height: 1.6;
 }
 
 .almanac-item.muted {
-  color: rgba(246, 239, 226, 0.62);
-  border-color: rgba(246, 239, 226, 0.18);
+  color: #9a948a;
+}
+
+.almanac-footer {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-top: 24rpx;
 }
 
 .almanac-note {
-  margin-top: 28rpx;
-  color: rgba(246, 239, 226, 0.42);
+  flex: 1;
+  color: #b5aea2;
   font-size: 22rpx;
   line-height: 1.5;
+}
+
+/* 全页唯一的朱砂点：白文小印章 */
+.vermillion-seal {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40rpx;
+  height: 40rpx;
+  margin-left: 24rpx;
+  color: #f7f2e7;
+  background: #a83c2a;
+  border-radius: 6rpx;
+  font-size: 24rpx;
+  font-family: "Songti SC", serif;
+}
+
+.history-entry {
+  display: flex;
+  justify-content: center;
+  margin-top: 80rpx;
+}
+
+.history-link {
+  padding: 14rpx 8rpx;
+  color: #6b675c;
+  font-size: 26rpx;
+  letter-spacing: 4rpx;
+  border-bottom: 1rpx solid rgba(35, 33, 28, 0.24);
+}
+
+/* 深色模式：玄墨色板，随系统切换 */
+@media (prefers-color-scheme: dark) {
+  .page-shell > view.paper-veil {
+    background: linear-gradient(180deg, #141614 0%, #0c0e0c 100%);
+  }
+
+  .date-ganzhi {
+    color: rgba(243, 219, 154, 0.9);
+  }
+
+  .date-lunar {
+    color: rgba(246, 239, 226, 0.5);
+  }
+
+  .seal-ring {
+    border-color: rgba(216, 174, 103, 0.55);
+  }
+
+  .entry-button {
+    color: #f3db9a;
+  }
+
+  .ritual-limit {
+    color: rgba(246, 239, 226, 0.5);
+  }
+
+  .caption-line {
+    background: rgba(216, 174, 103, 0.22);
+  }
+
+  .caption-text {
+    color: rgba(216, 174, 103, 0.78);
+  }
+
+  .rule-title {
+    color: #f6efe2;
+  }
+
+  .rule-text {
+    color: rgba(246, 239, 226, 0.58);
+  }
+
+  .almanac-meta {
+    color: rgba(246, 239, 226, 0.58);
+  }
+
+  .almanac-label {
+    color: #d8ae67;
+  }
+
+  .almanac-label.muted {
+    color: rgba(246, 239, 226, 0.5);
+  }
+
+  .almanac-item {
+    color: rgba(243, 219, 154, 0.9);
+  }
+
+  .almanac-item.muted {
+    color: rgba(246, 239, 226, 0.5);
+  }
+
+  .almanac-note {
+    color: rgba(246, 239, 226, 0.34);
+  }
+
+  .vermillion-seal {
+    color: #f7f2e7;
+    background: #a83c2a;
+  }
+
+  .history-link {
+    color: rgba(216, 174, 103, 0.72);
+    border-bottom-color: rgba(216, 174, 103, 0.32);
+  }
 }

@@ -7,10 +7,12 @@
   ],
   "window": {
     "navigationBarTitleText": "问道",
-    "navigationBarBackgroundColor": "#10100f",
-    "navigationBarTextStyle": "white",
-    "backgroundColor": "#10100f"
+    "navigationBarBackgroundColor": "@navBgColor",
+    "navigationBarTextStyle": "@navTxtStyle",
+    "backgroundColor": "@bgColor"
   },
+  "darkmode": true,
+  "themeLocation": "theme.json",
   "sitemapLocation": "sitemap.json",
   "style": "v2",
   "componentFramework": "glass-easel"

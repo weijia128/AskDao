@@ -1,3 +1,6 @@
 {
-  "navigationBarTitleText": "小六壬"
+  "navigationBarTitleText": "小六壬",
+  "navigationBarBackgroundColor": "@navBgColor",
+  "navigationBarTextStyle": "@navTxtStyle",
+  "backgroundColor": "@bgColor"
 }

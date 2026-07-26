@@ -1,10 +1,13 @@
 import type { RuleResult } from './types'
 
 import {
+  XIAO_LIUREN_COUNT_SEQUENCE,
   buildXiaoLiurenCountPath as buildCountPathCore,
   calculateXiaoLiuren as calculateCore,
   getChineseHour as getChineseHourCore,
 } from './xiao-liuren.core'
+
+export { XIAO_LIUREN_COUNT_SEQUENCE }
 
 export interface XiaoLiurenInput {
   lunarMonth: number

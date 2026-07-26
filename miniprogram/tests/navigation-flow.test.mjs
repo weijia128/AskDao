@@ -258,6 +258,8 @@ test('ritual page shows a center spinning wait state before auto navigating', as
   const ritualSource = await readText('../pages/xiao-liuren/index.ts')
 
   assert.match(ritualMarkup, /spinning-ring/)
+  assert.match(ritualMarkup, /count-symbol/)
+  assert.match(ritualMarkup, /{{countSymbol}}/)
   assert.doesNotMatch(ritualMarkup, /liuren-hand/)
   assert.doesNotMatch(ritualMarkup, /handPalaces/)
   assert.doesNotMatch(ritualMarkup, /hand-palace/)
@@ -267,12 +269,13 @@ test('ritual page shows a center spinning wait state before auto navigating', as
   assert.doesNotMatch(ritualSource, /LIUREN_HAND_PALACES/)
   assert.doesNotMatch(ritualSource, /activePalaceIndex/)
   assert.match(ritualStyles, /@keyframes spin/)
-  assert.match(ritualStyles, /\.ritual-action\.active\s*{[\s\S]*width: 336rpx;[\s\S]*height: 336rpx;/)
-  assert.match(ritualStyles, /\.active \.spinning-ring\s*{[\s\S]*width: 328rpx;[\s\S]*height: 328rpx;/)
+  assert.match(ritualStyles, /\.ritual-action\s*{[\s\S]*width: 336rpx;[\s\S]*height: 336rpx;/)
+  assert.match(ritualStyles, /\.spinning-ring\s*{[\s\S]*width: 328rpx;[\s\S]*height: 328rpx;/)
   assert.doesNotMatch(ritualStyles, /liuren-hand/)
   assert.doesNotMatch(ritualStyles, /hand-palace/)
   assert.doesNotMatch(ritualStyles, /palacePulse/)
   assert.match(ritualSource, /buildXiaoLiurenCountPath/)
+  assert.match(ritualSource, /XIAO_LIUREN_COUNT_SEQUENCE/)
   assert.match(ritualSource, /ANIMATION_STEP_MS/)
   assert.match(ritualSource, /runCountAnimation/)
   assert.doesNotMatch(ritualSource, /}, 1200\)/)
@@ -280,7 +283,7 @@ test('ritual page shows a center spinning wait state before auto navigating', as
   assert.match(ritualSource, /setTimeout/)
   assert.match(
     ritualSource,
-    /this\.runCountAnimation\(countPath, \(\) => \{[\s\S]*this\.setData\(\{ isDivining: false \}\)[\s\S]*wx\.navigateTo\(\{ url: '\/pages\/result\/index' \}\)/
+    /this\.runCountAnimation\(countPath, \(\) => \{[\s\S]*this\.setData\(\{ isDivining: false, countSymbol: '' \}\)[\s\S]*wx\.navigateTo\(\{ url: '\/pages\/result\/index' \}\)/
   )
   assert.match(ritualSource, /\/pages\/result\/index/)
 })

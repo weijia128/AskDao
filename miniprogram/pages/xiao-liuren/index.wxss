@@ -1,8 +1,50 @@
 .ritual-page {
   display: flex;
   flex-direction: column;
+}
+
+/* 宣纸底：宋人尺牍，无光晕、无投影 */
+.page-shell > view.paper-veil {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  background: linear-gradient(180deg, #f7f2e7 0%, #efe8d7 100%);
+}
+
+.ritual-caption {
+  display: flex;
   align-items: center;
-  justify-content: center;
+  margin-top: 56rpx;
+}
+
+.panel-caption {
+  display: flex;
+  align-items: center;
+}
+
+.caption-line {
+  flex: 1;
+  height: 1rpx;
+  background: rgba(35, 33, 28, 0.14);
+}
+
+.caption-text {
+  padding: 0 24rpx;
+  color: #6b675c;
+  font-size: 24rpx;
+  font-family: "Songti SC", serif;
+  letter-spacing: 8rpx;
+}
+
+.ritual-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 104rpx;
 }
 
 .ritual-action {
@@ -12,34 +54,27 @@
   justify-content: center;
   width: 336rpx;
   height: 336rpx;
-  transition: width 0.2s ease, height 0.2s ease;
+  transition: transform 0.18s ease, opacity 0.18s ease;
 }
 
-.ritual-action.active {
-  width: 336rpx;
-  height: 336rpx;
+.ritual-action-hover {
+  opacity: 0.75;
+  transform: scale(0.98);
 }
 
 .spinning-ring {
   position: absolute;
   top: 50%;
   left: 50%;
+  z-index: 3;
   width: 328rpx;
   height: 328rpx;
-  margin-left: -164rpx;
   margin-top: -164rpx;
-  border: 4rpx solid rgba(216, 174, 103, 0.14);
-  border-top-color: #f3db9a;
+  margin-left: -164rpx;
+  border: 3rpx solid rgba(35, 33, 28, 0.12);
+  border-top-color: #a83c2a;
   border-radius: 50%;
   animation: spin 1s linear infinite;
-  z-index: 3;
-}
-
-.active .spinning-ring {
-  width: 328rpx;
-  height: 328rpx;
-  margin-left: -164rpx;
-  margin-top: -164rpx;
 }
 
 @keyframes spin {
@@ -52,70 +87,142 @@
   }
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .spinning-ring {
+    animation: none;
+  }
+}
+
 .circle {
   position: absolute;
   top: 50%;
   left: 50%;
+  z-index: 4;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   width: 280rpx;
   height: 280rpx;
-  margin-left: -140rpx;
   margin-top: -140rpx;
-  border: 2rpx solid rgba(216, 174, 103, 0.48);
+  margin-left: -140rpx;
+  border: 2rpx solid rgba(35, 33, 28, 0.5);
   border-radius: 50%;
-  box-shadow: 0 0 80rpx rgba(216, 174, 103, 0.18);
-  transition: width 0.2s ease, height 0.2s ease, margin 0.2s ease;
-  z-index: 4;
-}
-
-.inner {
-  color: #d8ae67;
-  font-size: 58rpx;
-  font-family: "Songti SC", serif;
-  letter-spacing: 0;
+  transition: border-color 0.2s ease;
 }
 
 .active .circle {
-  border-color: rgba(243, 219, 154, 0.78);
-  box-shadow: 0 0 96rpx rgba(216, 174, 103, 0.28);
+  border-color: rgba(35, 33, 28, 0.72);
+}
+
+.inner {
+  color: #23211c;
+  font-size: 56rpx;
+  font-family: "Songti SC", serif;
+  font-weight: 700;
+  letter-spacing: 10rpx;
+}
+
+.count-symbol {
+  color: #23211c;
+  font-size: 44rpx;
+  font-family: "Songti SC", serif;
+  font-weight: 700;
+  letter-spacing: 6rpx;
 }
 
 .title {
-  margin-top: 48rpx;
-  color: #f6efe2;
+  margin-top: 56rpx;
+  color: #23211c;
   font-size: 40rpx;
+  font-family: "Songti SC", serif;
+  letter-spacing: 4rpx;
 }
 
-.subtitle {
-  margin-top: 16rpx;
-  color: rgba(246, 239, 226, 0.6);
-  font-size: 26rpx;
+.guidance-panel {
+  margin-top: 96rpx;
 }
 
-.guidance {
-  width: 82%;
-  margin-top: 32rpx;
-  color: rgba(246, 239, 226, 0.72);
-  font-size: 26rpx;
+.guidance-lead {
+  margin-top: 30rpx;
+  color: #23211c;
+  font-size: 28rpx;
   line-height: 1.6;
-  text-align: center;
 }
 
 .guidance-line {
-  margin-top: 14rpx;
-  color: rgba(243, 219, 154, 0.86);
+  margin-top: 20rpx;
+  font-size: 26rpx;
+  line-height: 1.5;
+}
+
+.guidance-line.positive {
+  color: #23211c;
+}
+
+.guidance-line.negative {
+  color: #9a948a;
 }
 
 .guidance-note {
-  margin-top: 18rpx;
-  color: rgba(246, 239, 226, 0.54);
+  margin-top: 30rpx;
+  color: #b5aea2;
   font-size: 24rpx;
+  line-height: 1.5;
 }
 
-.primary-button {
-  width: 80%;
-  margin-top: 56rpx;
+/* 深色模式：玄墨色板，随系统切换 */
+@media (prefers-color-scheme: dark) {
+  .page-shell > view.paper-veil {
+    background: linear-gradient(180deg, #141614 0%, #0c0e0c 100%);
+  }
+
+  .caption-line {
+    background: rgba(216, 174, 103, 0.22);
+  }
+
+  .caption-text {
+    color: rgba(216, 174, 103, 0.78);
+  }
+
+  .spinning-ring {
+    border-color: rgba(216, 174, 103, 0.14);
+    border-top-color: #f3db9a;
+  }
+
+  .circle {
+    border-color: rgba(216, 174, 103, 0.55);
+  }
+
+  .active .circle {
+    border-color: rgba(243, 219, 154, 0.78);
+  }
+
+  .inner {
+    color: #f3db9a;
+  }
+
+  .count-symbol {
+    color: #f3db9a;
+  }
+
+  .title {
+    color: #f6efe2;
+  }
+
+  .guidance-lead {
+    color: rgba(246, 239, 226, 0.78);
+  }
+
+  .guidance-line.positive {
+    color: rgba(243, 219, 154, 0.88);
+  }
+
+  .guidance-line.negative {
+    color: rgba(246, 239, 226, 0.5);
+  }
+
+  .guidance-note {
+    color: rgba(246, 239, 226, 0.4);
+  }
 }

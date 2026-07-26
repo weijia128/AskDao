@@ -1,30 +1,40 @@
 <view class="page-shell home-page">
-  <image class="page-background" src="/assets/images/page-bg.png" mode="aspectFill"></image>
-  <view class="page-background-shade"></view>
+  <view class="paper-veil"></view>
+
+  <view class="date-header">
+    <view class="date-ganzhi">{{almanac.ganzhiText}}</view>
+    <view class="date-lunar">{{almanac.lunarText}} · {{almanac.weekdayText}}</view>
+  </view>
 
   <view class="hero">
     <view class="taiji-entry" hover-class="taiji-entry-active" bindtap="handleStart">
-      <image class="bagua-image" src="/assets/images/bagua-taiji.png" mode="aspectFit"></image>
+      <view class="seal-ring">
+        <image class="bagua-image" src="/assets/images/bagua-taiji.png" mode="aspectFit"></image>
+      </view>
       <view class="entry-button">问道</view>
     </view>
+    <view class="ritual-limit">{{dailyLimitText}}</view>
   </view>
 
-  <view class="ritual-rules">
-    <view wx:for="{{ritualRules}}" wx:key="title" class="ritual-rule">
-      <view class="ritual-rule-title">{{item.title}}</view>
-      <view class="ritual-rule-text">{{item.text}}</view>
+  <view class="rules-panel">
+    <view class="panel-caption">
+      <view class="caption-line"></view>
+      <view class="caption-text">占前须知</view>
+      <view class="caption-line"></view>
+    </view>
+    <view wx:for="{{ritualRules}}" wx:key="title" class="rule-row">
+      <view class="rule-title">{{item.title}}</view>
+      <view class="rule-text">{{item.text}}</view>
     </view>
   </view>
 
-  <view class="ritual-limit">{{dailyLimitText}}</view>
-
-  <view class="history-entry" bindtap="handleOpenHistory">问道记录</view>
-
   <view class="almanac-panel">
-    <view class="almanac-title">今日黄历</view>
-    <view class="almanac-date">{{almanac.solarText}} · {{almanac.weekdayText}}</view>
-    <view class="almanac-lunar">{{almanac.lunarText}} · {{almanac.ganzhiText}}</view>
-    <view class="almanac-meta">{{almanac.zodiacText}} · {{almanac.chongShaText}}</view>
+    <view class="panel-caption">
+      <view class="caption-line"></view>
+      <view class="caption-text">今日黄历</view>
+      <view class="caption-line"></view>
+    </view>
+    <view class="almanac-meta">{{almanac.solarText}} · {{almanac.zodiacText}} · {{almanac.chongShaText}}</view>
 
     <view class="almanac-row">
       <view class="almanac-label">宜</view>
@@ -40,6 +50,13 @@
       </view>
     </view>
 
-    <view class="almanac-note">宜忌据 6tail/lunar-javascript 生成，仅供民俗参考。</view>
+    <view class="almanac-footer">
+      <view class="almanac-note">宜忌据 6tail/lunar-javascript 生成，仅供民俗参考。</view>
+      <view class="vermillion-seal">问</view>
+    </view>
+  </view>
+
+  <view class="history-entry">
+    <view class="history-link" bindtap="handleOpenHistory">问道记录</view>
   </view>
 </view>

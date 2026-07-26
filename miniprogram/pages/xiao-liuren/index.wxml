@@ -1,18 +1,32 @@
 <view class="page-shell ritual-page">
-  <image class="page-background" src="/assets/images/page-bg.png" mode="aspectFill"></image>
-  <view class="page-background-shade"></view>
+  <view class="paper-veil"></view>
 
-  <view class="ritual-action {{isDivining ? 'active' : ''}}" bindtap="handleDivine">
-    <view class="spinning-ring" wx:if="{{isDivining}}"></view>
-    <view class="circle">
-      <view class="inner">{{isDivining ? '起课中' : '起念'}}</view>
-    </view>
+  <view class="ritual-caption">
+    <view class="caption-line"></view>
+    <view class="caption-text">遇事不决，六壬决断</view>
+    <view class="caption-line"></view>
   </view>
-  <view class="title">心中默念所想</view>
-  <view class="guidance">
-    <view>请在心中默问一件小事，一个方向。</view>
-    <view class="guidance-line">宜问：这件事今天推进，是否合适？</view>
-    <view class="guidance-line">不宜问：我应该怎么办？</view>
+
+  <view class="ritual-hero">
+    <view class="ritual-action {{isDivining ? 'active' : ''}}" hover-class="ritual-action-hover" bindtap="handleDivine">
+      <view class="spinning-ring" wx:if="{{isDivining}}"></view>
+      <view class="circle">
+        <view class="count-symbol" wx:if="{{isDivining && countSymbol}}">{{countSymbol}}</view>
+        <view class="inner" wx:else>{{isDivining ? '起课中' : '起念'}}</view>
+      </view>
+    </view>
+    <view class="title">心中默念所想</view>
+  </view>
+
+  <view class="guidance-panel">
+    <view class="panel-caption">
+      <view class="caption-line"></view>
+      <view class="caption-text">如何问</view>
+      <view class="caption-line"></view>
+    </view>
+    <view class="guidance-lead">请在心中默问一件小事，一个方向。</view>
+    <view class="guidance-line positive">宜问：这件事今天推进，是否合适？</view>
+    <view class="guidance-line negative">不宜问：我应该怎么办？</view>
     <view class="guidance-note">不以玩笑试探，不反复追问同一事。</view>
   </view>
 </view>

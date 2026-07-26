@@ -1,5 +1,5 @@
 import { runXiaoLiurenDivination } from '../../application/divination-service'
-import { buildXiaoLiurenCountPath } from '../../domain/rules/xiao-liuren'
+import { buildXiaoLiurenCountPath, XIAO_LIUREN_COUNT_SEQUENCE } from '../../domain/rules/xiao-liuren'
 import { saveHistoryRecord } from '../../services/storage'
 import { track } from '../../services/analytics'
 import { canStartDailyDivination, recordDailyDivination } from '../../services/daily-limit.core'
@@ -13,6 +13,7 @@ Page({
     questionType: 'daily_state',
     questionText: '',
     isDivining: false,
+    countSymbol: '',
   },
 
   countTimer: 0,
@@ -39,11 +40,26 @@ Page({
 
   runCountAnimation(countPath: number[], onComplete: () => void) {
     this.clearCountTimer()
-    const waitMs = Math.max(countPath.length, 1) * ANIMATION_STEP_MS + ANIMATION_SETTLE_MS
-    this.countTimer = setTimeout(() => {
-      this.countTimer = 0
-      onComplete()
-    }, waitMs)
+    const totalSteps = Math.max(countPath.length, 1)
+    let step = 0
+
+    const tick = () => {
+      if (step >= totalSteps) {
+        this.countTimer = setTimeout(() => {
+          this.countTimer = 0
+          onComplete()
+        }, ANIMATION_SETTLE_MS)
+        return
+      }
+
+      this.setData({
+        countSymbol: XIAO_LIUREN_COUNT_SEQUENCE[step % XIAO_LIUREN_COUNT_SEQUENCE.length],
+      })
+      step += 1
+      this.countTimer = setTimeout(tick, ANIMATION_STEP_MS)
+    }
+
+    tick()
   },
 
   async handleDivine() {
@@ -109,7 +125,7 @@ Page({
     })
 
     this.runCountAnimation(countPath, () => {
-      this.setData({ isDivining: false })
+      this.setData({ isDivining: false, countSymbol: '' })
       wx.navigateTo({ url: '/pages/result/index' })
     })
   },

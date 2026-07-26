@@ -1,3 +1,6 @@
 {
-  "navigationBarTitleText": "断课"
+  "navigationBarTitleText": "断课",
+  "navigationBarBackgroundColor": "#10100f",
+  "navigationBarTextStyle": "white",
+  "backgroundColor": "#10100f"
 }

@@ -28,12 +28,13 @@ test('lunar date conversion uses the same real calendar source', () => {
   })
 })
 
-test('home page uses taiji entry and almanac instead of daily result card', async () => {
+test('home page uses taiji seal entry and almanac instead of daily result card', async () => {
   const homeMarkup = await readText('../pages/home/index.wxml')
   const homeSource = await readText('../pages/home/index.ts')
   const homeStyles = await readText('../pages/home/index.wxss')
 
   assert.match(homeMarkup, /taiji-entry/)
+  assert.match(homeMarkup, /seal-ring/)
   assert.match(homeMarkup, /assets\/images\/bagua-taiji\.png/)
   assert.match(homeMarkup, /entry-button/)
   assert.match(homeMarkup, />问道<\/view>/)
@@ -41,8 +42,9 @@ test('home page uses taiji entry and almanac instead of daily result card', asyn
   assert.match(homeMarkup, /hover-class="taiji-entry-active"/)
   assert.match(homeStyles, /entry-button/)
   assert.match(homeStyles, /font-family: "Songti SC", serif/)
-  assert.match(homeStyles, /font-size: 36rpx/)
-  assert.match(homeStyles, /rgba\(17, 16, 14, 0\.48\)/)
+  assert.match(homeStyles, /font-size: 44rpx/)
+  assert.match(homeStyles, /letter-spacing: 14rpx/)
+  assert.match(homeStyles, /seal-ring/)
   assert.doesNotMatch(homeStyles, /background: rgba\(243, 219, 154, 0\.94\)/)
   assert.match(homeMarkup, /今日黄历/)
   assert.match(homeMarkup, /almanac\.lunarText/)
@@ -72,7 +74,7 @@ test('mini program runtime imports almanac through TypeScript adapter', async ()
   assert.match(homeSource, /from '..\/..\/domain\/calendar\/almanac'/)
 })
 
-test('functional pages use the shared ink landscape background image', async () => {
+test('functional pages except home use the shared ink landscape background image', async () => {
   const appJson = JSON.parse(await readText('../app.json'))
   const background = await stat(new URL('../assets/images/page-bg.png', import.meta.url))
   const appStyles = await readText('../app.wxss')
@@ -80,19 +82,26 @@ test('functional pages use the shared ink landscape background image', async () 
   assert.equal(background.isFile(), true)
   assert.match(appStyles, /page-background/)
 
+  const inkVeilPages = new Set(['pages/home/index', 'pages/xiao-liuren/index'])
   for (const pagePath of appJson.pages) {
     const markup = await readText(`../${pagePath}.wxml`)
+    if (inkVeilPages.has(pagePath)) {
+      assert.doesNotMatch(markup, /class="page-background"/)
+      continue
+    }
     assert.match(markup, /class="page-background"/)
     assert.match(markup, /\/assets\/images\/page-bg\.png/)
   }
 })
 
-test('home page no longer uses the old gradient ink layer background', async () => {
+test('home page uses a plain rice paper veil background instead of images or old gradients', async () => {
   const homeMarkup = await readText('../pages/home/index.wxml')
   const homeStyles = await readText('../pages/home/index.wxss')
 
+  assert.match(homeMarkup, /paper-veil/)
+  assert.doesNotMatch(homeMarkup, /page-bg\.png/)
   assert.doesNotMatch(homeMarkup, /ink-layer/)
   assert.doesNotMatch(homeStyles, /ink-layer/)
-  assert.match(homeStyles, /taiji/)
-  assert.doesNotMatch(homeStyles, /radial-gradient/)
+  assert.match(homeStyles, /paper-veil/)
+  assert.match(homeStyles, /seal-ring/)
 })

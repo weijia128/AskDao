@@ -2,6 +2,7 @@ import test from 'node:test'
 import assert from 'node:assert/strict'
 
 import {
+  XIAO_LIUREN_COUNT_SEQUENCE,
   buildXiaoLiurenCountPath,
   calculateXiaoLiuren,
   getChineseHour,
@@ -69,4 +70,26 @@ test('hand counting path lands on 空亡 when the rule remainder is 0', () => {
   })
 
   assert.deepEqual(path, [0, 1, 2, 3, 4, 5])
+})
+
+test('count sequence final step lands exactly on the calculated symbol', () => {
+  const samples = [
+    { lunarMonth: 7, lunarDay: 21, hourIndex: 5 },
+    { lunarMonth: 1, lunarDay: 1, hourIndex: 6 },
+    { lunarMonth: 6, lunarDay: 13, hourIndex: 6 },
+    { lunarMonth: 12, lunarDay: 30, hourIndex: 12 },
+    { lunarMonth: 2, lunarDay: 9, hourIndex: 1 },
+  ]
+
+  for (const sample of samples) {
+    const result = calculateXiaoLiuren({
+      ...sample,
+      hourBranch: '辰',
+      createdAt: '2026-07-21T07:00:00+08:00',
+    })
+    const path = buildXiaoLiurenCountPath(sample)
+    const finalDisplay = XIAO_LIUREN_COUNT_SEQUENCE[(path.length - 1) % XIAO_LIUREN_COUNT_SEQUENCE.length]
+
+    assert.equal(finalDisplay, result.symbol)
+  }
 })
