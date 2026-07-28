@@ -109,7 +109,7 @@
   font-size: 22rpx;
 }
 
-.verification-card-canvas {
+.page-shell > canvas.verification-card-canvas {
   position: fixed;
   top: -9999px;
   left: -9999px;

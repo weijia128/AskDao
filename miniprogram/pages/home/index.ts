@@ -63,6 +63,7 @@ Page({
     almanac: emptyAlmanac,
     dueRecord: null,
     dueRecordTimeText: '',
+    isProcessingVerification: false,
   },
 
   onLoad(options) {
@@ -117,11 +118,17 @@ Page({
   },
 
   handleVerify(event) {
+    if (this.data.isProcessingVerification) {
+      return
+    }
+
     const action = event.currentTarget?.dataset?.action
     const record = this.data.dueRecord
     if (!action || !record) {
       return
     }
+
+    this.setData({ isProcessingVerification: true })
 
     const status = action === 'defer' ? resolveDeferAction(record) : action
     const patch = buildVerificationPatch(status)
@@ -135,9 +142,11 @@ Page({
     })
     wx.showToast({ title: status === 'fulfilled' ? '已记应验' : '已记下', icon: 'none' })
 
-    // 清空后立刻重扫，把积压的下一条接上
-    this.setData({ dueRecord: null, dueRecordTimeText: '' })
-    this.refreshDueVerification()
+    // 先让旧操作区完成退场，再接上积压的下一条，避免旧按钮事件误标新记录。
+    this.setData({ dueRecord: null, dueRecordTimeText: '' }, () => {
+      this.refreshDueVerification()
+      this.setData({ isProcessingVerification: false })
+    })
   },
 
   // history 与 askdao_latest_result 是两份副本，命中最新记录时必须一起更新，

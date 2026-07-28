@@ -40,6 +40,15 @@ test('首页标记验证后写回历史并同步最新记录副本', async () =>
   assert.match(homeSource, /track\('mark_verification'/)
 })
 
+test('首页验课拒绝渲染切换中的快速重复点击', async () => {
+  const homeSource = await readText('../pages/home/index.ts')
+
+  assert.match(
+    homeSource,
+    /isProcessingVerification: false,[\s\S]*handleVerify\(event\) \{[\s\S]*if \(this\.data\.isProcessingVerification\) \{\s*return\s*\}[\s\S]*this\.setData\(\{ isProcessingVerification: true \}\)[\s\S]*this\.setData\(\{ dueRecord: null, dueRecordTimeText: '' \}, \(\) => \{\s*this\.refreshDueVerification\(\)\s*this\.setData\(\{ isProcessingVerification: false \}\)\s*\}\)/,
+  )
+})
+
 test('验证事件已登记到分析事件表', async () => {
   const analyticsSource = await readText('../services/analytics.ts')
 
@@ -95,7 +104,10 @@ test('问道录可导出验课卡并保存到相册', async () => {
   assert.match(historySource, /track\('save_verification_card'/)
   assert.match(historySource, /isBuildingCard/)
 
-  assert.match(historyStyles, /\.verification-card-canvas\s*\{[\s\S]*position: fixed;/)
+  assert.match(
+    historyStyles,
+    /\.page-shell\s*>\s*canvas\.verification-card-canvas\s*\{[^}]*position:\s*fixed;/,
+  )
   assert.match(historyStyles, /\.verify-card-button/)
 })
 
