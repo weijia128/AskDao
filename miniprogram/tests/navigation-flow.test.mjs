@@ -343,8 +343,10 @@ test('ritual page shows a center spinning wait state before auto navigating', as
   assert.match(ritualSource, /setTimeout/)
   assert.match(
     ritualSource,
-    /this\.runCountAnimation\(countPath, \(\) => \{[\s\S]*this\.setData\(\{ isDivining: false, countSymbol: '' \}\)[\s\S]*wx\.navigateTo\(\{ url: '\/pages\/result\/index' \}\)/
+    /this\.runCountAnimation\(countPath, \(\) => \{[\s\S]*this\.navigateToResult\('\/pages\/result\/index'\)/
   )
+  assert.match(ritualSource, /navigateToResult\(url: string\) {[\s\S]*wx\.navigateTo\(\{ url \}\)[\s\S]*setTimeout/)
+  assert.match(ritualSource, /this\.setData\(\{ isDivining: false, countSymbol: '' \}\)/)
   assert.match(ritualSource, /\/pages\/result\/index/)
 })
 

@@ -69,6 +69,14 @@ Page({
     tick()
   },
 
+  // 跳转后再重置起课态：让落宫宫位在页面转场期间保持显示，流程不断帧
+  navigateToResult(url: string) {
+    wx.navigateTo({ url })
+    setTimeout(() => {
+      this.setData({ isDivining: false, countSymbol: '' })
+    }, 400)
+  },
+
   handleNoteInput(event) {
     this.setData({ questionText: event.detail.value })
   },
@@ -103,8 +111,7 @@ Page({
       })
 
       this.runCountAnimation(countPath, () => {
-        this.setData({ isDivining: false, countSymbol: '' })
-        wx.navigateTo({ url: '/pages/result/index?repeat=1' })
+        this.navigateToResult('/pages/result/index?repeat=1')
       })
       return
     }
@@ -172,8 +179,7 @@ Page({
     })
 
     this.runCountAnimation(countPath, () => {
-      this.setData({ isDivining: false, countSymbol: '' })
-      wx.navigateTo({ url: '/pages/result/index' })
+      this.navigateToResult('/pages/result/index')
     })
   },
 })

@@ -1,5 +1,8 @@
 .home-page {
-  padding-bottom: 64rpx;
+  display: flex;
+  flex-direction: column;
+  padding-top: 24rpx;
+  padding-bottom: 32rpx;
 }
 
 /* 宣纸底：宋人尺牍，无光晕、无投影 */
@@ -15,7 +18,7 @@
 }
 
 .date-header {
-  margin-top: 72rpx;
+  margin-top: 32rpx;
   text-align: center;
 }
 
@@ -33,11 +36,15 @@
   letter-spacing: 2rpx;
 }
 
+/* hero 弹性吸余量：大屏时太极章垂直居中舒展，小屏时自然紧凑、页面可滚动 */
 .hero {
+  flex: 1 0 auto;
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-top: 88rpx;
+  justify-content: center;
+  margin-top: 24rpx;
+  margin-bottom: 24rpx;
 }
 
 .taiji-entry {
@@ -56,20 +63,20 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 300rpx;
-  height: 300rpx;
+  width: 260rpx;
+  height: 260rpx;
   border: 2rpx solid rgba(35, 33, 28, 0.5);
   border-radius: 50%;
 }
 
 .bagua-image {
-  width: 208rpx;
-  height: 208rpx;
+  width: 180rpx;
+  height: 180rpx;
   border-radius: 50%;
 }
 
 .entry-button {
-  margin-top: 36rpx;
+  margin-top: 24rpx;
   padding-left: 14rpx;
   color: #23211c;
   font-size: 44rpx;
@@ -80,7 +87,7 @@
 
 .ritual-limit {
   max-width: 560rpx;
-  margin-top: 28rpx;
+  margin-top: 20rpx;
   color: #9a948a;
   font-size: 24rpx;
   line-height: 1.7;
@@ -88,7 +95,7 @@
 }
 
 .rules-panel {
-  margin-top: 96rpx;
+  margin-top: 52rpx;
 }
 
 .panel-caption {
@@ -113,7 +120,7 @@
 .rule-row {
   display: flex;
   align-items: baseline;
-  margin-top: 30rpx;
+  margin-top: 24rpx;
 }
 
 .rule-title {
@@ -132,11 +139,11 @@
 }
 
 .almanac-panel {
-  margin-top: 84rpx;
+  margin-top: 52rpx;
 }
 
 .almanac-meta {
-  margin-top: 26rpx;
+  margin-top: 20rpx;
   color: #6b675c;
   font-size: 24rpx;
   line-height: 1.6;
@@ -145,7 +152,7 @@
 .almanac-row {
   display: flex;
   align-items: baseline;
-  margin-top: 20rpx;
+  margin-top: 14rpx;
 }
 
 .almanac-label {
@@ -181,7 +188,7 @@
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
-  margin-top: 24rpx;
+  margin-top: 18rpx;
 }
 
 .almanac-note {
@@ -217,7 +224,7 @@
 .history-entry {
   display: flex;
   justify-content: center;
-  margin-top: 80rpx;
+  margin-top: 40rpx;
 }
 
 .history-link {

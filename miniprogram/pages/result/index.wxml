@@ -48,7 +48,7 @@
 
   <view class="thought-mask" wx:if="{{record && showThoughtNoteCard}}" catchtap="handleCloseThoughtNote"></view>
   <view
-    class="thought-note glass-card"
+    class="thought-note"
     wx:if="{{record && showThoughtNoteCard}}"
     style="bottom: {{keyboardHeight ? keyboardHeight + 'px' : '40rpx'}}"
   >
