@@ -109,6 +109,25 @@
   font-size: 22rpx;
 }
 
+.verification-card-canvas {
+  position: fixed;
+  top: -9999px;
+  left: -9999px;
+  width: 375px;
+  height: 560px;
+}
+
+.verify-card-button {
+  margin: 32rpx auto 16rpx;
+  padding: 20rpx 0;
+  width: 320rpx;
+  color: #4a3d24;
+  border: 1rpx solid rgba(122, 96, 54, 0.36);
+  border-radius: 999rpx;
+  font-size: 27rpx;
+  text-align: center;
+}
+
 /* 深色模式：玄墨色板，随系统切换 */
 @media (prefers-color-scheme: dark) {
   .page-shell > view.paper-veil {
@@ -158,5 +177,10 @@
   .verify-tag {
     color: rgba(232, 222, 198, 0.72);
     border-color: rgba(214, 199, 160, 0.28);
+  }
+
+  .verify-card-button {
+    color: #e8dec6;
+    border-color: rgba(214, 199, 160, 0.3);
   }
 }

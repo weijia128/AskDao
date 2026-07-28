@@ -28,8 +28,15 @@
   </view>
 
   <view
+    class="verify-card-button"
+    wx:if="{{summary.settled}}"
+    bindtap="handleSaveVerificationCard"
+  >保存验课卡</view>
+
+  <view
     class="clear-all-button"
     wx:if="{{records.length}}"
     bindtap="handleClearAllRecords"
   >清除全部记录</view>
+  <canvas class="verification-card-canvas" canvas-id="verificationCardCanvas"></canvas>
 </view>

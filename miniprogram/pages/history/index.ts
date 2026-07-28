@@ -6,9 +6,17 @@ import {
   getHistoryRecords,
 } from '../../services/storage'
 import { getVerificationLabel, summarizeVerifications } from '../../domain/verification/verification'
+import {
+  buildVerificationCardModel,
+  VERIFICATION_CARD_CODE_SLOT,
+  VERIFICATION_CARD_HEIGHT,
+  VERIFICATION_CARD_TONE,
+  VERIFICATION_CARD_WIDTH,
+} from '../../services/verification-card-image.core'
 
 const SWIPE_OPEN_THRESHOLD = 48
 const SWIPE_CLOSE_THRESHOLD = 24
+const VERIFICATION_CARD_CANVAS_ID = 'verificationCardCanvas'
 
 function buildDisplayRecords(records) {
   return records.map((record) => ({
@@ -25,6 +33,7 @@ Page({
     openedRecordId: '',
     touchStartX: 0,
     touchRecordId: '',
+    isBuildingCard: false,
   },
 
   onShow() {
@@ -85,6 +94,136 @@ Page({
       touchRecordId: '',
     })
     wx.showToast({ title: '已删除', icon: 'success' })
+  },
+
+  drawVerificationCard(ctx, model) {
+    const background = ctx.createLinearGradient(0, 0, 0, VERIFICATION_CARD_HEIGHT)
+    background.addColorStop(0, VERIFICATION_CARD_TONE.gradientFrom)
+    background.addColorStop(1, VERIFICATION_CARD_TONE.gradientTo)
+    ctx.setFillStyle(background)
+    ctx.fillRect(0, 0, VERIFICATION_CARD_WIDTH, VERIFICATION_CARD_HEIGHT)
+
+    const glow = ctx.createCircularGradient(
+      VERIFICATION_CARD_WIDTH / 2,
+      VERIFICATION_CARD_HEIGHT * 0.4,
+      VERIFICATION_CARD_WIDTH * 0.55,
+    )
+    glow.addColorStop(0, VERIFICATION_CARD_TONE.glow)
+    glow.addColorStop(1, 'rgba(0, 0, 0, 0)')
+    ctx.setFillStyle(glow)
+    ctx.fillRect(0, 0, VERIFICATION_CARD_WIDTH, VERIFICATION_CARD_HEIGHT)
+
+    ctx.setStrokeStyle(VERIFICATION_CARD_TONE.border)
+    ctx.setLineWidth(1)
+    ctx.strokeRect(28, 34, VERIFICATION_CARD_WIDTH - 56, VERIFICATION_CARD_HEIGHT - 68)
+    ctx.setStrokeStyle('rgba(255, 246, 216, 0.14)')
+    ctx.strokeRect(38, 44, VERIFICATION_CARD_WIDTH - 76, VERIFICATION_CARD_HEIGHT - 88)
+
+    ctx.setFillStyle('rgba(255, 246, 216, 0.92)')
+    ctx.setFontSize(20)
+    ctx.fillText(model.brand, 48, 72)
+
+    ctx.setFillStyle('rgba(255, 246, 216, 0.66)')
+    ctx.setFontSize(15)
+    ctx.fillText(model.title, 48, 106)
+
+    ctx.setTextAlign('center')
+    ctx.setFillStyle('#fff6d8')
+    ctx.setFontSize(96)
+    ctx.fillText(model.rateText, VERIFICATION_CARD_WIDTH / 2, 268)
+
+    ctx.setFillStyle('rgba(255, 246, 216, 0.66)')
+    ctx.setFontSize(16)
+    ctx.fillText(model.rateCaption, VERIFICATION_CARD_WIDTH / 2, 302)
+
+    ctx.setFillStyle('rgba(255, 246, 216, 0.85)')
+    ctx.setFontSize(16)
+    model.statLines.forEach((line, index) => {
+      ctx.fillText(line, VERIFICATION_CARD_WIDTH / 2, 356 + index * 30)
+    })
+
+    ctx.setFillStyle('rgba(255, 246, 216, 0.5)')
+    ctx.setFontSize(13)
+    ctx.fillText(model.rangeText, VERIFICATION_CARD_WIDTH / 2, 424)
+
+    ctx.setFillStyle('rgba(255, 246, 216, 0.4)')
+    ctx.setFontSize(11)
+    ctx.fillText(model.disclaimer, VERIFICATION_CARD_WIDTH / 2, 548)
+    ctx.setTextAlign('left')
+
+    ctx.setStrokeStyle('rgba(255, 246, 216, 0.32)')
+    ctx.setLineWidth(1)
+    ctx.strokeRect(
+      VERIFICATION_CARD_CODE_SLOT.x,
+      VERIFICATION_CARD_CODE_SLOT.y,
+      VERIFICATION_CARD_CODE_SLOT.size,
+      VERIFICATION_CARD_CODE_SLOT.size,
+    )
+    ctx.setFillStyle('rgba(255, 246, 216, 0.5)')
+    ctx.setFontSize(13)
+    ctx.fillText('问', VERIFICATION_CARD_CODE_SLOT.x + 21, VERIFICATION_CARD_CODE_SLOT.y + 24)
+    ctx.fillText('道', VERIFICATION_CARD_CODE_SLOT.x + 21, VERIFICATION_CARD_CODE_SLOT.y + 42)
+  },
+
+  buildVerificationCardImage() {
+    const model = buildVerificationCardModel(getHistoryRecords())
+    if (!model) {
+      return Promise.reject(new Error('No settled verification'))
+    }
+
+    const ctx = wx.createCanvasContext(VERIFICATION_CARD_CANVAS_ID, this)
+    this.drawVerificationCard(ctx, model)
+
+    return new Promise((resolve, reject) => {
+      ctx.draw(false, () => {
+        wx.canvasToTempFilePath(
+          {
+            canvasId: VERIFICATION_CARD_CANVAS_ID,
+            width: VERIFICATION_CARD_WIDTH,
+            height: VERIFICATION_CARD_HEIGHT,
+            destWidth: VERIFICATION_CARD_WIDTH * 2,
+            destHeight: VERIFICATION_CARD_HEIGHT * 2,
+            fileType: 'jpg',
+            quality: 0.92,
+            success: (res) => resolve(res.tempFilePath),
+            fail: reject,
+          },
+          this,
+        )
+      })
+    })
+  },
+
+  async handleSaveVerificationCard() {
+    if (this.data.isBuildingCard || !this.data.summary.settled) {
+      return
+    }
+
+    this.setData({ isBuildingCard: true })
+
+    try {
+      const imagePath = await this.buildVerificationCardImage()
+      wx.saveImageToPhotosAlbum({
+        filePath: imagePath,
+        success: () => {
+          track('save_verification_card', {
+            settled: this.data.summary.settled,
+            rate: this.data.summary.rate,
+          })
+          wx.showToast({ title: '已保存到相册', icon: 'success' })
+        },
+        fail: () => {
+          wx.showToast({ title: '保存失败', icon: 'none' })
+        },
+        complete: () => {
+          this.setData({ isBuildingCard: false })
+        },
+      })
+    } catch (error) {
+      console.error('Build verification card failed:', error)
+      this.setData({ isBuildingCard: false })
+      wx.showToast({ title: '生成失败', icon: 'none' })
+    }
   },
 
   handleClearAllRecords() {

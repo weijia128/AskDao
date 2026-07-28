@@ -76,3 +76,33 @@ test('问道录展示每条记录的验证状态与累计应验率', async () =>
   assert.match(historyStyles, /\.verify-summary/)
   assert.match(historyStyles, /\.verify-tag/)
 })
+
+test('问道录可导出验课卡并保存到相册', async () => {
+  const historyMarkup = await readText('../pages/history/index.wxml')
+  const historySource = await readText('../pages/history/index.ts')
+  const historyStyles = await readText('../pages/history/index.wxss')
+
+  assert.match(historyMarkup, /verificationCardCanvas/)
+  assert.match(historyMarkup, /verify-card-button/)
+  assert.match(historyMarkup, /保存验课卡/)
+  assert.match(historyMarkup, /bindtap="handleSaveVerificationCard"/)
+  assert.match(historyMarkup, /wx:if="\{\{summary\.settled\}\}"/)
+
+  assert.match(historySource, /buildVerificationCardModel/)
+  assert.match(historySource, /wx\.createCanvasContext/)
+  assert.match(historySource, /wx\.canvasToTempFilePath/)
+  assert.match(historySource, /wx\.saveImageToPhotosAlbum/)
+  assert.match(historySource, /track\('save_verification_card'/)
+  assert.match(historySource, /isBuildingCard/)
+
+  assert.match(historyStyles, /\.verification-card-canvas\s*\{[\s\S]*position: fixed;/)
+  assert.match(historyStyles, /\.verify-card-button/)
+})
+
+test('验课卡不写入任何此念原文', async () => {
+  const cardSource = await readText('../services/verification-card-image.core.js')
+  const historySource = await readText('../pages/history/index.ts')
+
+  assert.doesNotMatch(cardSource, /thought_note/)
+  assert.doesNotMatch(historySource, /drawVerificationCard[\s\S]*thought_note/)
+})
