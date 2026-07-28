@@ -55,3 +55,24 @@ test('验课闭环不引入签到打卡类机制', async () => {
     assert.doesNotMatch(source, /连续|签到|积分|徽章|打卡/)
   }
 })
+
+test('问道录展示每条记录的验证状态与累计应验率', async () => {
+  const historyMarkup = await readText('../pages/history/index.wxml')
+  const historySource = await readText('../pages/history/index.ts')
+  const historyStyles = await readText('../pages/history/index.wxss')
+
+  assert.match(historyMarkup, /verify-summary/)
+  assert.match(historyMarkup, /\{\{summary\.settled\}\}/)
+  assert.match(historyMarkup, /\{\{summary\.fulfilled\}\}/)
+  assert.match(historyMarkup, /\{\{summary\.rate\}\}%/)
+  assert.match(historyMarkup, /应验率/)
+  assert.match(historyMarkup, /\{\{item\.verificationText\}\}/)
+  assert.match(historyMarkup, /wx:if="\{\{item\.verificationText\}\}"/)
+
+  assert.match(historySource, /getVerificationLabel/)
+  assert.match(historySource, /summarizeVerifications/)
+  assert.match(historySource, /verificationText/)
+
+  assert.match(historyStyles, /\.verify-summary/)
+  assert.match(historyStyles, /\.verify-tag/)
+})

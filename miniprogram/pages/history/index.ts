@@ -5,6 +5,7 @@ import {
   formatHistoryCreatedAt,
   getHistoryRecords,
 } from '../../services/storage'
+import { getVerificationLabel, summarizeVerifications } from '../../domain/verification/verification'
 
 const SWIPE_OPEN_THRESHOLD = 48
 const SWIPE_CLOSE_THRESHOLD = 24
@@ -13,12 +14,14 @@ function buildDisplayRecords(records) {
   return records.map((record) => ({
     ...record,
     createdAtText: formatHistoryCreatedAt(record?.rule_result?.created_at || record?.created_at || ''),
+    verificationText: getVerificationLabel(record),
   }))
 }
 
 Page({
   data: {
     records: [],
+    summary: { fulfilled: 0, unfulfilled: 0, unclear: 0, deferred: 0, settled: 0, total: 0, rate: 0 },
     openedRecordId: '',
     touchStartX: 0,
     touchRecordId: '',
@@ -29,9 +32,11 @@ Page({
   },
 
   refreshRecords() {
-    const records = buildDisplayRecords(getHistoryRecords())
+    const rawRecords = getHistoryRecords()
+    const records = buildDisplayRecords(rawRecords)
     this.setData({
       records,
+      summary: summarizeVerifications(rawRecords),
       openedRecordId: '',
       touchStartX: 0,
       touchRecordId: '',
@@ -71,9 +76,10 @@ Page({
       return
     }
 
-    const records = buildDisplayRecords(deleteHistoryRecord(recordId))
+    const rawRecords = deleteHistoryRecord(recordId)
     this.setData({
-      records,
+      records: buildDisplayRecords(rawRecords),
+      summary: summarizeVerifications(rawRecords),
       openedRecordId: '',
       touchStartX: 0,
       touchRecordId: '',
@@ -100,6 +106,7 @@ Page({
         clearHistoryRecords()
         this.setData({
           records: [],
+          summary: { fulfilled: 0, unfulfilled: 0, unclear: 0, deferred: 0, settled: 0, total: 0, rate: 0 },
           openedRecordId: '',
           touchStartX: 0,
           touchRecordId: '',

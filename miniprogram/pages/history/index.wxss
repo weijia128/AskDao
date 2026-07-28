@@ -94,6 +94,21 @@
   border-radius: 999rpx;
 }
 
+.verify-summary {
+  margin: -12rpx 0 28rpx;
+  color: #7a6036;
+  font-size: 26rpx;
+}
+
+.verify-tag {
+  margin-left: 16rpx;
+  padding: 4rpx 16rpx;
+  color: #6b5636;
+  border: 1rpx solid rgba(122, 96, 54, 0.32);
+  border-radius: 999rpx;
+  font-size: 22rpx;
+}
+
 /* 深色模式：玄墨色板，随系统切换 */
 @media (prefers-color-scheme: dark) {
   .page-shell > view.paper-veil {
@@ -134,5 +149,14 @@
   .clear-all-button {
     color: rgba(224, 122, 102, 0.9);
     border-color: rgba(224, 122, 102, 0.4);
+  }
+
+  .verify-summary {
+    color: rgba(232, 222, 198, 0.6);
+  }
+
+  .verify-tag {
+    color: rgba(232, 222, 198, 0.72);
+    border-color: rgba(214, 199, 160, 0.28);
   }
 }
