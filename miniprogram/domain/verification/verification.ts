@@ -2,6 +2,7 @@ import {
   buildVerificationPatch as buildVerificationPatchCore,
   getDueVerificationRecord as getDueVerificationRecordCore,
   getVerificationLabel as getVerificationLabelCore,
+  isVerificationDue as isVerificationDueCore,
   resolveDeferAction as resolveDeferActionCore,
   summarizeVerifications as summarizeVerificationsCore,
   VERIFICATION_FIRST_WINDOW_DAYS,
@@ -26,6 +27,10 @@ export interface VerificationSummary {
   settled: number
   total: number
   rate: number
+}
+
+export function isVerificationDue(record: unknown, now: Date = new Date()): boolean {
+  return isVerificationDueCore(record, now)
 }
 
 export function getDueVerificationRecord<T>(records: T[], now: Date = new Date()): T | null {
