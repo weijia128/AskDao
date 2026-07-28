@@ -28,6 +28,12 @@ const CHINESE_HOURS = [
   { branch: '亥', index: 12, range: '21:00-22:59', start: 21, end: 22 },
 ]
 
+const SHANGHAI_OFFSET_MS = 8 * 60 * 60 * 1000
+
+function pad(value) {
+  return `${value}`.padStart(2, '0')
+}
+
 export function mapRemainderToSymbol(remainder) {
   if (!Number.isInteger(remainder) || remainder < 0 || remainder > 5) {
     throw new Error(`Invalid xiao liuren remainder: ${remainder}`)
@@ -65,6 +71,35 @@ export function getChineseHour(hour) {
   }
 }
 
+export function getShanghaiChineseHour(date = new Date()) {
+  const instant = date instanceof Date ? date : new Date(date)
+  if (Number.isNaN(instant.getTime())) {
+    throw new Error(`Invalid date: ${date}`)
+  }
+
+  const shanghaiDate = new Date(instant.getTime() + SHANGHAI_OFFSET_MS)
+  return getChineseHour(shanghaiDate.getUTCHours())
+}
+
+export function buildDivinationPeriodKey(date, hourIndex) {
+  const instant = date instanceof Date ? date : new Date(date)
+  if (Number.isNaN(instant.getTime())) {
+    throw new Error(`Invalid date: ${date}`)
+  }
+  if (!Number.isInteger(hourIndex) || hourIndex < 1 || hourIndex > 12) {
+    throw new Error(`Invalid hourIndex: ${hourIndex}`)
+  }
+
+  const shanghaiDate = new Date(instant.getTime() + SHANGHAI_OFFSET_MS)
+  const dateKey = [
+    shanghaiDate.getUTCFullYear(),
+    pad(shanghaiDate.getUTCMonth() + 1),
+    pad(shanghaiDate.getUTCDate()),
+  ].join('-')
+
+  return `${dateKey}/${hourIndex}`
+}
+
 export function buildXiaoLiurenCountPath(input) {
   const { lunarMonth, lunarDay, hourIndex } = input
 
@@ -90,7 +125,7 @@ export function buildCountStepDelays(totalSteps) {
 }
 
 export function calculateXiaoLiuren(input) {
-  const { lunarMonth, lunarDay, hourIndex, hourBranch, createdAt } = input
+  const { lunarMonth, lunarDay, hourIndex, hourBranch, createdAt, isLeapMonth = false } = input
 
   for (const [key, value] of Object.entries({ lunarMonth, lunarDay, hourIndex })) {
     if (!Number.isInteger(value) || value <= 0) {
@@ -108,6 +143,7 @@ export function calculateXiaoLiuren(input) {
     input_snapshot: {
       lunar_month: lunarMonth,
       lunar_day: lunarDay,
+      is_leap_month: Boolean(isLeapMonth),
       hour_branch: hourBranch,
       hour_index: hourIndex,
     },

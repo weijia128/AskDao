@@ -26,8 +26,8 @@ test('theme file defines light and dark window variables', async () => {
   assert.equal(theme.dark.bgColor, '#10100f')
 })
 
-test('ritual-flow pages follow system theme via variables', async () => {
-  for (const page of ['../pages/home/index.json', '../pages/xiao-liuren/index.json']) {
+test('themed pages follow system theme via variables', async () => {
+  for (const page of ['../pages/home/index.json', '../pages/xiao-liuren/index.json', '../pages/history/index.json']) {
     const pageJson = await readJson(page)
 
     assert.equal(pageJson.navigationBarBackgroundColor, '@navBgColor')
@@ -36,18 +36,16 @@ test('ritual-flow pages follow system theme via variables', async () => {
   }
 })
 
-test('result and history pages stay dark in both modes', async () => {
-  for (const page of ['../pages/result/index.json', '../pages/history/index.json']) {
-    const pageJson = await readJson(page)
+test('result page stays dark in both modes', async () => {
+  const pageJson = await readJson('../pages/result/index.json')
 
-    assert.equal(pageJson.navigationBarBackgroundColor, '#10100f')
-    assert.equal(pageJson.navigationBarTextStyle, 'white')
-    assert.equal(pageJson.backgroundColor, '#10100f')
-  }
+  assert.equal(pageJson.navigationBarBackgroundColor, '#10100f')
+  assert.equal(pageJson.navigationBarTextStyle, 'white')
+  assert.equal(pageJson.backgroundColor, '#10100f')
 })
 
-test('ritual-flow pages define dark mode style overrides', async () => {
-  for (const page of ['../pages/home/index.wxss', '../pages/xiao-liuren/index.wxss']) {
+test('themed pages define dark mode style overrides', async () => {
+  for (const page of ['../pages/home/index.wxss', '../pages/xiao-liuren/index.wxss', '../pages/history/index.wxss']) {
     const styles = await readText(page)
 
     assert.match(styles, /@media \(prefers-color-scheme: dark\)/)

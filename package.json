@@ -4,9 +4,10 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node --test \"miniprogram/tests/*.test.mjs\""
+    "test": "node --test \"miniprogram/tests/*.test.mjs\"",
+    "build:almanac": "node scripts/build-almanac.mjs"
   },
-  "dependencies": {
+  "devDependencies": {
     "lunar-javascript": "^1.7.7"
   }
 }

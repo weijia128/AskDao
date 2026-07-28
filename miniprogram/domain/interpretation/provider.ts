@@ -4,6 +4,8 @@ export interface InterpretationContext {
   questionType: QuestionType
   questionText?: string
   tone: 'mysterious' | 'calm'
+  variantIndex?: number
+  selectionKey?: string
 }
 
 export interface InterpretationResult {
@@ -11,7 +13,6 @@ export interface InterpretationResult {
   oracleText: string
   explanation: string
   actionHint: string
-  reflectionQuestion: string
   disclaimer: string
 }
 

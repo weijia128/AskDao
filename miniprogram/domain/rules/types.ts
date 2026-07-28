@@ -17,6 +17,8 @@ export interface DivinationInput {
   startedAt: string
   timezone: 'Asia/Shanghai'
   source: 'daily' | 'quick' | 'share'
+  variantIndex?: number
+  selectionKey?: string
 }
 
 export interface RuleResult {
@@ -25,6 +27,7 @@ export interface RuleResult {
   input_snapshot: {
     lunar_month: number
     lunar_day: number
+    is_leap_month: boolean
     hour_branch: string
     hour_index: number
   }

@@ -8,11 +8,24 @@ import type { DivinationInput } from '../domain/rules/types'
 export async function runXiaoLiurenDivination(input: DivinationInput) {
   const risk = checkQuestionRisk(input.questionText)
   if (!risk.safe) {
-    return { ok: false as const, risk }
+    return { ok: false as const, type: 'keyword_risk' as const, risk }
   }
 
   const startedAt = new Date(input.startedAt)
-  const lunar = getLunarDateFromLocalDate(startedAt)
+  let lunar
+  try {
+    lunar = getLunarDateFromLocalDate(startedAt)
+  } catch (error) {
+    return {
+      ok: false as const,
+      type: 'unsupported_date' as const,
+      risk: {
+        safe: false,
+        categories: [],
+        message: '当前日期暂不在支持范围内，请更新版本后再试。',
+      },
+    }
+  }
   const hour = getCurrentChineseHour(startedAt)
   const ruleResult = calculateXiaoLiuren({
     lunarMonth: lunar.lunarMonth,
@@ -20,11 +33,14 @@ export async function runXiaoLiurenDivination(input: DivinationInput) {
     hourIndex: hour.index,
     hourBranch: hour.branch,
     createdAt: input.startedAt,
+    isLeapMonth: lunar.isLeapMonth,
   })
   const interpretation = await new TemplateInterpretationProvider().generate(ruleResult, {
     questionType: input.questionType,
     questionText: input.questionText,
     tone: 'mysterious',
+    variantIndex: input.variantIndex,
+    selectionKey: input.selectionKey,
   })
 
   return { ok: true as const, ruleResult, interpretation }

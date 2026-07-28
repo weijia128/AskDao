@@ -1,107 +1,62 @@
-# AskDao 小程序 MVP 差距优化方案
+# AskDao 三项改进方案 v2（已评审修订）
 
-## Context
+## 评审结论
 
-对照 PRD / 研发框架 / 上线准备三份文档做完差距分析后，规则与流程内核完成度已很高，缺口集中在「验证与上线」：埋点只打 console 不上报、无小程序卡片分享与回流识别、getUserProfile 已废弃、缺隐私清理入口、一批死代码、主包图片体积偏大（约 1.1MB / 上限 2MB）。
+方向认可：文案轮换 + 常驻翻面提示（低风险高收益）、构建期静态历法数据（可行，需先实测体积）。
+v1 的四处硬伤已修正：体积模型、`used` 字段、日期级重复键、闰月契约；两处流程问题已修正：配额顺序、repeat 通知脏状态；测试契约加强。
 
-**用户已确认的边界**：
-- 首页保持现状，不做「今日问道」每日仪式模块
-- 范围 = 除首页仪式外的全部：埋点上报、分享回流、隐私与审核准备、死代码删除、图片压缩
-- 做 onShareAppMessage + onShareTimeline
-- 死代码直接删除
-- 小程序码本轮只做码位预留，发布后用静态太阳码替换（不接后端）
+## 修正要点（相对 v1）
 
-## 任务与改动
+| # | v1 问题 | v2 修正 |
+|---|---|---|
+| 1 | JSON 体积估算错误（实测 516KiB），且 source map 不计入上传包（`uploadWithSourceMap: true`），真实基线 438KB，原方案反而增大 ~90KB | 先实测上传包基线；JSON 改「顺序数组 + 共享字典索引」紧凑结构（原型验证黄历 412KB→~135KB） |
+| 2 | `getDailyDivinationUsage` 无 `used` 字段，`templates[NaN]` 会崩 | 用 `usage.count`；Provider 按 `templates.length` 取模，不硬编码 3 |
+| 3 | 重复键只比农历月日时辰，跨年同农历误判 | `periodKey` = 上海时区民用日期 + hourIndex（如 `2026-07-27/4`），存入 record |
+| 4 | 配额检查在计算前，第三问后的重复显示「三问已满」而非重复提示 | periodKey 计算提前：先判重复（免费）→ 再判配额 |
+| 5 | 闰月负值（2025-07-25 → -6）导致起课抛错——**现网 bug** | 换算层输出正月份 + `isLeapMonth`；计算层只收正数；显示层加「闰」；固定闰月日期测试 |
+| 6 | `askdao_repeat_notice` 落 storage 有脏状态 | 改用 `/pages/result/index?repeat=1` query 参数 |
+| 7 | 源码正则断言无法证明运行时行为 | 起课主流程抽成可注入 storage 的纯函数，真实断言历史/次数/latest；静态 JSON 带 version 元信息与加载、降级契约 |
 
-### F. 死代码删除（最先做）
+## 任务零（前置）：体积原型与基线实测
 
-删除以下已核实零引用的路径：
+- 用开发者工具「上传」测当前主包基线（记录精确字节数）
+- 紧凑结构生成器原型：黄历数据「顺序数组（按日偏移）+ 宜忌词条共享字符串表 + 干支/生肖查表」；目标：lunar-days + almanac 合计 ≤ 250KB，且对比基线净减 ≥ 300KB
+- go/no-go：达不到净减目标则放弃任务二，保留 lunar-javascript，仅做任务一/三
 
-- `miniprogram/components/` 下 6 个空壳组件（ambient-background、daily-ritual、question-type-picker、result-panel、ritual-button、share-poster）及空目录
-- `miniprogram/application/result-service.ts`
-- `miniprogram/services/poster.ts`
-- `miniprogram/assets/images/liuren-hand.png`
-- `miniprogram/pages/question/`（未注册、无入口，PRD 明确 MVP 0.1 不做问题类型选择）
-- `miniprogram/design/copywriting.ts`（仅被 pages/question 引用）、`miniprogram/design/tokens.ts`（零引用）及空目录
+## 任务三：模板文案轮换 + 翻面引导（先实施）
 
-测试影响已核实：`navigation-flow.test.mjs` 中 question 页与 liuren-hand 相关断言全部是 `doesNotMatch` 否定断言，删除后自动通过。新增防回归用例（可放 `tests/devtools-config.test.mjs`）：断言上述路径不存在、4 个页面 json 无 `usingComponents`。
+- `templates.ts`：每宫位 3 套文案（数组），字段不变，遵守 PRD §11 文案原则
+- `template-provider.ts`：`context.variantIndex ?? 0`，取 `templates[variantIndex % templates.length]`
+- `divination-service.ts`：`DivinationInput` 加可选 `variantIndex`；页面传 `getDailyDivinationUsage(wx).count`（已核实字段存在）
+- 结果页卡下常驻引导：`{{isCardBackVisible ? '轻点卡面 · 翻回宫位' : '轻点卡面 · 翻看断课'}}`
+- 测试：每宫位 3 套字段齐全；variantIndex 轮换（含 >length 取模）；文案禁用词黑名单扫描；引导文案断言
 
-### G. 图片压缩（独立）
+## 任务一：重复起课处理 + 闰月修复（次实施）
 
-用 pngquant 有损压缩，**不换 WebP**（result-card-bg 走 canvas drawImage，Android WebP 兼容不稳）：
+- `xiao-liuren.core.js`：新增 `buildDivinationPeriodKey(date, hourIndex)`（上海时区 `YYYY-MM-DD/hourIndex`）；换算层输出正月份 + `isLeapMonth`，`calculateXiaoLiuren`/`buildXiaoLiurenCountPath` 只收正数；`formatLunarTimeText` 显示层加「闰」
+- 起课主流程抽纯函数（storage 注入）：先算 periodKey → 与 latest record 的 periodKey 比对
+  - 命中：`track('repeat_divination')`，不写历史/不扣次数/不覆盖 latest，`wx.navigateTo('/pages/result/index?repeat=1')`
+  - 未命中：再查配额 `canStartDailyDivination`，走原流程
+- 结果页 onLoad 读 `options.repeat` 显示提示条「此时辰已取过象，结果与前次相同，不妨换个时辰再问。」
+- 测试：periodKey 跨年/跨日/同时辰；闰月固定日期（2025-07-25 → 月 6 + isLeapMonth）；纯函数级断言「重复时历史长度/count/latest 均不变」；配额顺序（count=3 时重复仍放行提示）
 
-```bash
-cd miniprogram/assets/images
-pngquant --quality=65-85 --speed 1 -f -o page-bg.png page-bg.png
-pngquant --quality=65-85 --speed 1 -f -o result-card-bg.png result-card-bg.png
-pngquant --quality=70-90 --speed 1 -f -o bagua-taiji.png bagua-taiji.png
-```
+## 任务二：历法迁移（任务零达标后实施）
 
-目标：page-bg ≤150KB、result-card-bg ≤180KB、bagua-taiji ≤80KB。文件名不变，无引用改动。新增体积预算测试断言（防回弹）。压缩后在开发者工具重新生成结果卡目检渐变有无色带，有色带则对该图提高 quality。
-
-### H. types/index.d.ts 补全
-
-按全仓 wx.* 调用清单补声明：`removeStorageSync`、`showModal`、`createCanvasContext`（含 CanvasContextLike）、`canvasToTempFilePath`、`saveImageToPhotosAlbum`、`showShareImageMenu`、`reportAnalytics`、`getEnterOptionsSync?`。不引官方类型包、不加 getUserProfile 声明、`strict:false` 不变。
-
-### D. 去 getUserProfile（昵称水印移除）
-
-- `pages/result/index.ts`：删 `RESULT_CARD_WATERMARK_KEY`、`getStoredWatermarkName`、`getResultCardWatermarkName`，两个保存/分享方法去掉 watermark 参数
-- `services/result-card-image.core.js`：删 `normalizeWatermarkName`，`buildResultCardImageModel(record)` 改单参；`watermarkName` 换成固定署名 `signature: '问道人 起念'`
-- 测试：`tests/result-card-image.test.mjs:46` 的 `watermarkName '清和'` 断言改为 signature 断言；`navigation-flow.test.mjs` 补 `doesNotMatch(resultSource, /getUserProfile/)` 防回归
-
-删除后小程序零用户信息收集，公众平台隐私指引无需声明用户信息，降低审核风险。
-
-### C. 结果卡小程序码预留（依赖 D，同一绘制函数）
-
-- core：`RESULT_CARD_CODE_SLOT = { x: 277, y: 468, size: 56 }`（375x560 逻辑坐标，右下角）；model 加 `miniProgramCodeUrl`（本轮恒 `''`）
-- 绘制层：码位恒画占位（细描边圆 + 「问道」印记风格小字，不要像可扫码）；`miniProgramCodeUrl` 非空时 drawImage 真实码图
-- README 补「发布后替换静态太阳码」步骤（后台下载太阳码 → 压缩 ≤30KB → 放 assets/images/mp-code.png → 改 core 默认值 → 重新提审）
-- 测试：model 含 `miniProgramCodeUrl: ''`；码位坐标在画布内；仍不读取 `thought_note`（隐私断言沿用）
-
-### A. 埋点真实上报
-
-- 新建 `services/analytics.core.js`（纯逻辑）：
-  - `buildAnalyticsPayload(event, properties)`：附 `client_time`、不改入参
-  - `buildShareReopenProperties(options, scene)`：`source==='share'` 时返回 `{ template_id, share_scene }`（scene 1007/1008/1044→session、1154→timeline、其他→unknown），否则返回 null
-- 改 `services/analytics.ts`：`track()` 签名与事件名不变，内部优先 `wx.reportAnalytics`（后台未配置时微信端静默忽略），异常/不可用降级 `console.info`；事件联合类型新增 `'clear_history'`。所有现有 track() 调用点零改动
-- 改 `pages/home/index.ts` onLoad：现有 page_view 之后，用 `wx.getEnterOptionsSync?.().scene`（try/catch 兜底）+ options 调 `buildShareReopenProperties`，非 null 则 `track('reopen_from_share', props)`
-- 新增 `tests/analytics.test.mjs`：payload 构造、回流属性判定（share+1007→session、1154→timeline、direct→null）、源码断言 analytics.ts 含 reportAnalytics 且保留降级、home 含 reopen_from_share
-
-注意：`wx.reportAnalytics` 需公众平台「统计-自定义分析」配置事件后才入库，未配置静默忽略属预期。
-
-### B. 分享卡片 onShareAppMessage / onShareTimeline（依赖 A、C）
-
-- `pages/result/index.ts`：
-  - 卡片图 tempFilePath 缓存在 `this.cardImagePath`（页面实例字段），保存/分享图片先查缓存
-  - `onShareAppMessage()`：`track('share_click', { channel: 'session', ... })`，返回 `{ title: '小六壬断课 · {symbol} · {grade}', path: buildSharePath(templateId), imageUrl: this.cardImagePath || '/assets/images/result-card-bg.png' }`
-  - `onShareTimeline()`：query 加 `share_scene=timeline`，channel `'timeline'`
-  - 现有 showShareImageMenu 的 share_click 补 `channel: 'image_menu'`
-  - wxml 新增 `<button open-type="share">转发断课</button>` 显性入口（保留现有两按钮）
-- `services/wx-share.ts`：新增 `buildShareTimelineQuery(templateId)`，与 home 回流参数协议对齐
-- 测试：`navigation-flow.test.mjs:104` 的 `doesNotMatch(open-type="share")` 反转为 `match`；断言 result 源码含 onShareAppMessage/onShareTimeline/三个 channel
-
-### E. 隐私与记录管理（依赖 A 的 clear_history 事件名）
-
-- `services/storage.core.js` 加纯函数（保持 core/adapter 对称），`services/storage.ts` 加 `clearHistoryRecords()`（`wx.removeStorageSync(HISTORY_KEY)`）
-- `pages/history/`：列表底部加「清除全部记录」按钮 → `wx.showModal` 确认（confirmColor 朱红）→ 清除 + `track('clear_history', { count })` + toast。不清 `askdao_latest_result`（职责单一）
-- 产出隐私保护指引文案要点（供公众平台后台填写，不写代码页）：相册仅写入用途说明、不收集任何个人信息声明、本地记录仅存本机可一键清空、lunar-javascript 无数据外发
-- 测试：history 用例断言 clear-all 按钮/showModal/clear_history/removeStorageSync
-
-## 实施顺序
-
-F（删死代码）→ G（图片压缩）→ H（types）→ D（去 getUserProfile）→ C（码位预留）→ A（埋点）→ B（分享）→ E（隐私清理）
-
-依赖说明：D→C→B 同改 `pages/result/index.ts` 与 `result-card-image.core.js`，必须串行；A 先于 B/E（事件名与 track）；F 最先做以缩小后续测试断言搜索面。
+- `scripts/build-almanac.mjs`：紧凑结构生成，参数固定（年份区间、截断条数），输出带 `{ version, generatedAt, startDate, endDate }` 元信息
+- 运行期 `almanac.core.js` 重写为查表（小程序 `require` JSON）；表外降级：仅公历+星期+提示「请更新版本」；起课表（lunar-days）覆盖 2020-2035
+- `package.json`：lunar-javascript → devDependencies；删除 `miniprogram_npm/lunar-javascript/`，重新构建 npm
+- 测试：固定样例与 lunar-javascript 比对（含闰月日）；JSON 元信息契约；体积预算断言；2035 年后首页降级断言
 
 ## 验证
 
-- `npm test`（`node --test "miniprogram/tests/*.test.mjs"`）全绿，预计用例 45 → 约 52
-- 微信开发者工具人工清单：
-  1. 编译无 TS 报错，4 页正常打开
-  2. 带 `?source=share&template_id=A01` 编译模式启动首页 → Console 出现 reopen_from_share 降级日志
-  3. 保存卡片 → 无昵称授权弹窗，卡片为固定署名 + 码位占位圆
-  4. 「转发断课」与胶囊菜单转发 → 标题/图片/path 参数正确；朋友圈入口出现且 query 带 share_scene=timeline
-  5. showShareImageMenu 图片分享回归正常
-  6. 历史页清除全部 → showModal 确认/取消两路径；单条滑删回归
-  7. 预览包体积符合预算（3 图合计 ≤410KB）
-  8. 真机 Android + iOS 各回归第 3、4、5 项（canvas 与分享路径是真机差异高发区）
+- `npm test` 全绿（基线 69，预计 90+）
+- 主包：任务零实测基线 vs 任务二完成后实测，净减 ≥ 300KB 才合并
+- 人工：同时辰重复（提示+不扣次数+第三问后仍可见提示）、闰月日起课正常、文案轮换、翻面引导、黄历表外降级
+
+## 附：实施后代码审查的 5 项 LOW 修复（用户已确认）
+
+1. `divination-flow.core.js` 的 `resolveDivinationAttempt` 删除未被页面消费的 `shouldWriteHistory`/`shouldConsumeDailyUsage` 标志位（页面按 outcome 分支硬编码），测试同步删除标志断言、保留行为断言；`getRecordPeriodKey` 补注释：legacy record 的 hour_index 为旧本地时区算法，非东八区设备可能误判为「非重复」，无害可接受
+2. `divination-service.ts` 失败返回加 `type: 'keyword_risk' | 'unsupported_date'` 区分；起课页弹窗标题按类型区分：「暂不支持当前日期」/「暂不适合问道」
+3. 删除空 `miniprogram_npm/` 目录；README 标注当前无运行时依赖、无需执行「构建 npm」（packNpm 配置保留以便未来依赖）
+4. （同 1 的注释）
+5. 提醒用户在开发者工具实测上传包大小（人工动作，不改代码）

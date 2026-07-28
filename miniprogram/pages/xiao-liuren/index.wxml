@@ -18,6 +18,23 @@
     <view class="title">心中默念所想</view>
   </view>
 
+  <view class="note-entry {{noteFocused ? 'focused' : ''}}">
+    <view class="note-label">此念</view>
+    <textarea
+      class="note-input"
+      value="{{questionText}}"
+      maxlength="60"
+      placeholder="心中所问，可落笔于此（便于事后验证，仅本机可见）"
+      placeholder-class="note-placeholder"
+      auto-height
+      confirm-type="done"
+      bindinput="handleNoteInput"
+      bindfocus="handleNoteFocus"
+      bindblur="handleNoteBlur"
+    ></textarea>
+    <view class="note-meta" wx:if="{{noteFocused}}">{{questionText.length}}/60 · 仅存本机，不上传</view>
+  </view>
+
   <view class="guidance-panel">
     <view class="panel-caption">
       <view class="caption-line"></view>

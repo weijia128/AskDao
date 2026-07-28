@@ -43,10 +43,11 @@ Page({
     symbolTone: '',
     symbolChars: [],
     lunarTimeText: '',
+    showRepeatNotice: false,
     keyboardHeight: 0,
   },
 
-  onLoad() {
+  onLoad(options) {
     const record = wx.getStorageSync('askdao_latest_result')
     this.setData({
       record,
@@ -57,6 +58,7 @@ Page({
       symbolTone: getSymbolTone(record),
       symbolChars: splitResultSymbol(record?.rule_result?.symbol),
       lunarTimeText: formatLunarTimeText(record?.rule_result?.input_snapshot),
+      showRepeatNotice: options?.repeat === '1',
       keyboardHeight: 0,
     })
 

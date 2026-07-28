@@ -1,6 +1,6 @@
 {
   "navigationBarTitleText": "最近问道",
-  "navigationBarBackgroundColor": "#10100f",
-  "navigationBarTextStyle": "white",
-  "backgroundColor": "#10100f"
+  "navigationBarBackgroundColor": "@navBgColor",
+  "navigationBarTextStyle": "@navTxtStyle",
+  "backgroundColor": "@bgColor"
 }

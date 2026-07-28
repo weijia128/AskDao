@@ -186,10 +186,12 @@ test('result page shares the generated result card image instead of the app entr
 
 test('ritual page title uses silent question copy', async () => {
   const ritualMarkup = await readText('../pages/xiao-liuren/index.wxml')
+  const ritualSource = await readText('../pages/xiao-liuren/index.ts')
 
   assert.match(ritualMarkup, />心中默念所想</)
   assert.doesNotMatch(ritualMarkup, /心中默问起念/)
   assert.doesNotMatch(ritualMarkup, /静心一念，以此刻取月、日、时。/)
+  assert.match(ritualSource, /selectionKey: periodKey/)
 })
 
 test('home shows the small-question and three-question rule', async () => {
@@ -234,6 +236,9 @@ test('result page shows a symbolic front card that flips to interpretation', asy
   assert.match(resultMarkup, /record\.interpretation\.oracleText/)
   assert.match(resultMarkup, /record\.interpretation\.explanation/)
   assert.match(resultMarkup, /catchtap="handleSavePoster"/)
+  assert.match(resultMarkup, /flip-hint/)
+  assert.match(resultMarkup, /轻点卡面 · 翻看断课/)
+  assert.match(resultMarkup, /轻点卡面 · 翻回宫位/)
 
   assert.match(resultSource, /SYMBOL_TONES/)
   assert.match(resultSource, /isCardBackVisible: false/)
@@ -249,6 +254,7 @@ test('result page shows a symbolic front card that flips to interpretation', asy
 
   assert.match(resultStyles, /rotateY/)
   assert.match(resultStyles, /backface-visibility/)
+  assert.match(resultStyles, /\.flip-hint/)
   assert.match(resultStyles, /\.result-page\s*{[\s\S]*padding: 20rpx 16rpx 48rpx;/)
   assert.match(resultStyles, /\.result-card-shell\s*{[\s\S]*width: 100%;[\s\S]*height: 78vh;[\s\S]*min-height: 820rpx;/)
   assert.match(resultStyles, /\.card-face\s*{[\s\S]*padding: 44rpx 42rpx;/)
@@ -256,8 +262,33 @@ test('result page shows a symbolic front card that flips to interpretation', asy
   assert.match(resultStyles, /\.result-symbol\s*{[\s\S]*flex-direction: column;[\s\S]*gap: 28rpx;/)
   assert.match(resultStyles, /\.result-lunar-time\s*{[\s\S]*position: absolute;[\s\S]*bottom: 52rpx;[\s\S]*text-align: center;/)
   for (const toneClass of ['tone-da-an', 'tone-liu-lian', 'tone-su-xi', 'tone-chi-kou', 'tone-xiao-ji', 'tone-kong-wang']) {
-    assert.match(resultStyles, new RegExp(`\\.${toneClass} \\.card-front`))
+    assert.match(resultStyles, new RegExp(`\\.${toneClass} \\.card-face`))
+    assert.match(resultStyles, new RegExp(`\\.${toneClass} \\.card-back`))
   }
+
+  assert.doesNotMatch(resultStyles, /^\.card-back\s*{[^}]*background:/m)
+  assert.match(resultStyles, /^\.card-back\s*{[^}]*display: flex;[^}]*flex-direction: column;/m)
+  assert.match(resultStyles, /^\.text\s*{[^}]*margin-top: auto;/m)
+  assert.match(resultStyles, /^\.disclaimer\s*{[^}]*margin-top: auto;/m)
+})
+
+test('ritual page offers an optional thought note line saved with the record', async () => {
+  const ritualMarkup = await readText('../pages/xiao-liuren/index.wxml')
+  const ritualSource = await readText('../pages/xiao-liuren/index.ts')
+  const ritualStyles = await readText('../pages/xiao-liuren/index.wxss')
+
+  assert.match(ritualMarkup, /note-entry/)
+  assert.match(ritualMarkup, /note-input/)
+  assert.match(ritualMarkup, /此念/)
+  assert.match(ritualMarkup, /仅本机可见/)
+  assert.match(ritualMarkup, /maxlength="60"/)
+  assert.match(ritualMarkup, /仅存本机，不上传/)
+  assert.match(ritualSource, /handleNoteInput/)
+  assert.match(ritualSource, /noteFocused/)
+  assert.match(ritualSource, /questionText: thoughtNote/)
+  assert.match(ritualSource, /thought_note: thoughtNote/)
+  assert.match(ritualStyles, /\.note-entry/)
+  assert.match(ritualStyles, /\.note-placeholder/)
 })
 
 test('ritual page teaches how to ask before showing the result', async () => {
@@ -317,12 +348,29 @@ test('ritual page shows a center spinning wait state before auto navigating', as
   assert.match(ritualSource, /\/pages\/result\/index/)
 })
 
-test('ritual page guards against asking more than three times per day', async () => {
+test('ritual page resolves repeats before enforcing the daily limit', async () => {
   const ritualSource = await readText('../pages/xiao-liuren/index.ts')
 
-  assert.match(ritualSource, /canStartDailyDivination/)
+  assert.match(ritualSource, /resolveDivinationAttempt/)
+  assert.match(ritualSource, /attempt\.outcome === 'repeat'/)
+  assert.match(ritualSource, /attempt\.outcome === 'limit'/)
+  assert.ok(
+    ritualSource.indexOf("attempt.outcome === 'repeat'") < ritualSource.indexOf("attempt.outcome === 'limit'"),
+  )
   assert.match(ritualSource, /recordDailyDivination/)
+  assert.match(ritualSource, /period_key: periodKey/)
+  assert.match(ritualSource, /\/pages\/result\/index\?repeat=1/)
   assert.match(ritualSource, /今日三问已满/)
+})
+
+test('result page shows a transient notice for repeated periods', async () => {
+  const resultMarkup = await readText('../pages/result/index.wxml')
+  const resultSource = await readText('../pages/result/index.ts')
+
+  assert.match(resultMarkup, /showRepeatNotice/)
+  assert.match(resultMarkup, /此时辰已取过象，结果与前次相同，不妨换个时辰再问。/)
+  assert.match(resultSource, /options\?\.repeat === '1'/)
+  assert.doesNotMatch(resultSource, /askdao_repeat_notice/)
 })
 
 test('result disclaimer stays short and does not explain the calculation', async () => {

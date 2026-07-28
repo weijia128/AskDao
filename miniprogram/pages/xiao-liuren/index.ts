@@ -1,12 +1,15 @@
 import { runXiaoLiurenDivination } from '../../application/divination-service'
+import { resolveDivinationAttempt } from '../../application/divination-flow.core'
 import {
+  buildDivinationPeriodKey,
   buildCountStepDelays,
   buildXiaoLiurenCountPath,
   XIAO_LIUREN_COUNT_SEQUENCE,
 } from '../../domain/rules/xiao-liuren'
+import { getCurrentChineseHour } from '../../domain/calendar/chinese-hour'
 import { saveHistoryRecord } from '../../services/storage'
 import { track } from '../../services/analytics'
-import { canStartDailyDivination, recordDailyDivination } from '../../services/daily-limit.core'
+import { getDailyDivinationUsage, recordDailyDivination } from '../../services/daily-limit.core'
 
 const ANIMATION_SETTLE_MS = 450
 
@@ -17,6 +20,7 @@ Page({
     questionText: '',
     isDivining: false,
     countSymbol: '',
+    noteFocused: false,
   },
 
   countTimer: 0,
@@ -65,12 +69,47 @@ Page({
     tick()
   },
 
+  handleNoteInput(event) {
+    this.setData({ questionText: event.detail.value })
+  },
+
+  handleNoteFocus() {
+    this.setData({ noteFocused: true })
+  },
+
+  handleNoteBlur() {
+    this.setData({ noteFocused: false })
+  },
+
   async handleDivine() {
     if (this.data.isDivining) {
       return
     }
 
-    if (!canStartDailyDivination(wx)) {
+    const startedAtDate = new Date()
+    const hour = getCurrentChineseHour(startedAtDate)
+    const periodKey = buildDivinationPeriodKey(startedAtDate, hour.index)
+    const latestRecord = wx.getStorageSync('askdao_latest_result')
+    const usage = getDailyDivinationUsage(wx, startedAtDate)
+    const attempt = resolveDivinationAttempt({ periodKey, latestRecord, dailyUsage: usage })
+
+    if (attempt.outcome === 'repeat') {
+      this.setData({ isDivining: true })
+      track('repeat_divination', { symbol: latestRecord.rule_result.symbol })
+      const countPath = buildXiaoLiurenCountPath({
+        lunarMonth: latestRecord.rule_result.input_snapshot.lunar_month,
+        lunarDay: latestRecord.rule_result.input_snapshot.lunar_day,
+        hourIndex: latestRecord.rule_result.input_snapshot.hour_index,
+      })
+
+      this.runCountAnimation(countPath, () => {
+        this.setData({ isDivining: false, countSymbol: '' })
+        wx.navigateTo({ url: '/pages/result/index?repeat=1' })
+      })
+      return
+    }
+
+    if (attempt.outcome === 'limit') {
       wx.showModal({
         title: '今日三问已满',
         content: '问道重在一念，不宜反复试探。明日再来，取新的时机。',
@@ -79,22 +118,25 @@ Page({
       return
     }
 
-    const startedAt = new Date().toISOString()
+    const startedAt = startedAtDate.toISOString()
+    const thoughtNote = this.data.questionText.trim()
     this.setData({ isDivining: true })
     track('start_divination', { method: 'xiao_liuren' })
 
     const result = await runXiaoLiurenDivination({
       method: 'xiao_liuren',
       questionType: this.data.questionType,
-      questionText: this.data.questionText,
+      questionText: thoughtNote,
       startedAt,
       timezone: 'Asia/Shanghai',
       source: this.data.entry,
+      variantIndex: usage.count,
+      selectionKey: periodKey,
     })
 
     if (!result.ok) {
       wx.showModal({
-        title: '暂不适合问道',
+        title: result.type === 'unsupported_date' ? '暂不支持当前日期' : '暂不适合问道',
         content: result.risk.message,
         showCancel: false,
       })
@@ -109,12 +151,14 @@ Page({
       poster_template_id: 'A01',
       question_type: this.data.questionType,
       created_at: result.ruleResult.created_at,
+      period_key: periodKey,
+      thought_note: thoughtNote,
       is_favorite: false,
     }
 
     wx.setStorageSync('askdao_latest_result', record)
     saveHistoryRecord(record)
-    recordDailyDivination(wx)
+    recordDailyDivination(wx, startedAtDate)
     track('complete_divination', {
       symbol: result.ruleResult.symbol,
       grade: result.ruleResult.grade,

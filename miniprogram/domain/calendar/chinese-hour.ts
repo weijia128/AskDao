@@ -1,5 +1,5 @@
-import { getChineseHour } from '../rules/xiao-liuren'
+import { getShanghaiChineseHour } from '../rules/xiao-liuren'
 
 export function getCurrentChineseHour(date: Date = new Date()) {
-  return getChineseHour(date.getHours())
+  return getShanghaiChineseHour(date)
 }

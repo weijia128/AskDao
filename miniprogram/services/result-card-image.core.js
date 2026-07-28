@@ -1,3 +1,5 @@
+import { formatLunarDateText } from '../domain/calendar/almanac.core.js'
+
 export const RESULT_CARD_BACKGROUND_IMAGE = '/assets/images/result-card-bg.png'
 
 // 小程序码码位（375x560 逻辑坐标，右下角，避开内框线）。
@@ -77,45 +79,20 @@ function formatCreatedAt(createdAt = '') {
   return `${createdAt}`.slice(0, 16).replace('T', ' ')
 }
 
-const LUNAR_MONTHS = ['', '正', '二', '三', '四', '五', '六', '七', '八', '九', '十', '冬', '腊']
-const LUNAR_DAY_ONES = ['', '一', '二', '三', '四', '五', '六', '七', '八', '九', '十']
-
-function formatLunarDay(day) {
-  if (!Number.isInteger(day) || day < 1 || day > 30) {
-    return ''
-  }
-
-  if (day <= 10) {
-    return `初${LUNAR_DAY_ONES[day]}`
-  }
-
-  if (day < 20) {
-    return `十${LUNAR_DAY_ONES[day - 10]}`
-  }
-
-  if (day === 20) {
-    return '二十'
-  }
-
-  if (day < 30) {
-    return `廿${LUNAR_DAY_ONES[day - 20]}`
-  }
-
-  return '三十'
-}
-
 export function formatLunarTimeText(inputSnapshot = {}) {
-  const lunarMonth = inputSnapshot.lunar_month
-  const lunarDay = inputSnapshot.lunar_day
+  const rawLunarMonth = inputSnapshot.lunar_month
   const hourBranch = inputSnapshot.hour_branch
-  const monthText = LUNAR_MONTHS[lunarMonth]
-  const dayText = formatLunarDay(lunarDay)
+  const lunarText = formatLunarDateText({
+    lunarMonth: rawLunarMonth,
+    lunarDay: inputSnapshot.lunar_day,
+    isLeapMonth: inputSnapshot.is_leap_month,
+  })
 
-  if (!monthText || !dayText || !hourBranch) {
+  if (!lunarText || !hourBranch) {
     return ''
   }
 
-  return `农历${monthText}月${dayText} · ${hourBranch}时`
+  return `农历${lunarText} · ${hourBranch}时`
 }
 
 export function splitResultSymbol(symbol = '') {

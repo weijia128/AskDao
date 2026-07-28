@@ -3,10 +3,12 @@ import assert from 'node:assert/strict'
 
 import {
   XIAO_LIUREN_COUNT_SEQUENCE,
+  buildDivinationPeriodKey,
   buildCountStepDelays,
   buildXiaoLiurenCountPath,
   calculateXiaoLiuren,
   getChineseHour,
+  getShanghaiChineseHour,
   mapRemainderToSymbol,
 } from '../domain/rules/xiao-liuren.core.js'
 
@@ -38,6 +40,7 @@ test('calculates 农历七月二十一日辰时 as 大安 / 顺', () => {
     input_snapshot: {
       lunar_month: 7,
       lunar_day: 21,
+      is_leap_month: false,
       hour_branch: '辰',
       hour_index: 5,
     },
@@ -49,6 +52,46 @@ test('calculates 农历七月二十一日辰时 as 大安 / 顺', () => {
     grade: '顺',
     created_at: '2026-07-21T07:00:00+08:00',
   })
+})
+
+test('builds divination period keys from Shanghai civil date and hour index', () => {
+  const beforeShanghaiMidnight = new Date('2026-07-27T15:59:59.000Z')
+  const afterShanghaiMidnight = new Date('2026-07-27T16:00:00.000Z')
+
+  assert.equal(buildDivinationPeriodKey(beforeShanghaiMidnight, 12), '2026-07-27/12')
+  assert.equal(buildDivinationPeriodKey(afterShanghaiMidnight, 1), '2026-07-28/1')
+  assert.equal(
+    buildDivinationPeriodKey(new Date('2026-07-27T00:00:00.000Z'), 5),
+    buildDivinationPeriodKey(new Date('2026-07-27T00:59:59.000Z'), 5),
+  )
+  assert.notEqual(
+    buildDivinationPeriodKey(new Date('2026-07-27T00:00:00.000Z'), 5),
+    buildDivinationPeriodKey(new Date('2027-07-27T00:00:00.000Z'), 5),
+  )
+})
+
+test('maps an instant to its Chinese hour in Shanghai', () => {
+  assert.deepEqual(getShanghaiChineseHour(new Date('2026-07-26T23:00:00.000Z')), {
+    branch: '辰',
+    index: 5,
+    range: '07:00-08:59',
+  })
+})
+
+test('calculates a leap-month divination with a positive normalized month', () => {
+  const result = calculateXiaoLiuren({
+    lunarMonth: 6,
+    lunarDay: 1,
+    hourIndex: 5,
+    hourBranch: '辰',
+    createdAt: '2025-07-25T07:00:00+08:00',
+    isLeapMonth: true,
+  })
+
+  assert.equal(result.input_snapshot.lunar_month, 6)
+  assert.equal(result.input_snapshot.is_leap_month, true)
+  assert.equal(result.calculation.formula, '(6 + 1 + 5 - 2) % 6')
+  assert.equal(buildXiaoLiurenCountPath({ lunarMonth: 6, lunarDay: 1, hourIndex: 5 }).length, 10)
 })
 
 test('builds hand counting path from the same month day hour formula', () => {

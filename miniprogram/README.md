@@ -22,18 +22,14 @@ Not in MVP 0.1:
 
 Open the repository root in WeChat DevTools. The root `project.config.json` points `miniprogramRoot` to this directory.
 
-Because the home page uses `lunar-javascript` for real lunar calendar and almanac data, run dependency install once from the repository root:
+Calendar data is generated at build time. Install development dependencies and rebuild the checked-in tables from the repository root when their supported ranges need to change:
 
 ```bash
 npm install
+npm run build:almanac
 ```
 
-Then in WeChat DevTools run:
-
-```text
-工具 -> 构建 npm
-编译
-```
+`lunar-javascript` is a development-only generator dependency and is not included in the Mini Program package. The generated lunar conversion table covers 2020-2035; the detailed almanac covers 2025-2028 and falls back to the solar date outside that range.
 
 Run local rule tests from the repository root:
 

@@ -24,6 +24,7 @@ const emptyAlmanac = {
   chongShaText: '',
   yi: [],
   ji: [],
+  noticeText: '',
 }
 
 Page({

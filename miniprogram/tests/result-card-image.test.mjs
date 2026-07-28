@@ -117,6 +117,24 @@ test('result card image model splits two-character symbols for vertical display'
   assert.deepEqual(model.symbolChars, ['速', '喜'])
 })
 
+test('result card image labels a normalized leap lunar month', () => {
+  const model = buildResultCardImageModel({
+    rule_result: {
+      symbol: '小吉',
+      grade: '顺',
+      input_snapshot: {
+        lunar_month: 6,
+        lunar_day: 1,
+        is_leap_month: true,
+        hour_branch: '辰',
+      },
+    },
+    interpretation: {},
+  })
+
+  assert.equal(model.lunarTimeText, '农历闰六月初一 · 辰时')
+})
+
 test('result card image uses a balanced vertical symbol layout', () => {
   const layout = getVerticalSymbolLayout(['速', '喜'], {
     centerY: 184,

@@ -191,6 +191,14 @@
   line-height: 1.5;
 }
 
+.almanac-update-notice {
+  margin-top: 28rpx;
+  color: #7a7468;
+  font-size: 24rpx;
+  line-height: 1.6;
+  text-align: center;
+}
+
 /* 全页唯一的朱砂点：白文小印章 */
 .vermillion-seal {
   display: flex;
@@ -284,6 +292,10 @@
 
   .almanac-note {
     color: rgba(246, 239, 226, 0.34);
+  }
+
+  .almanac-update-notice {
+    color: rgba(246, 239, 226, 0.46);
   }
 
   .vermillion-seal {

@@ -139,8 +139,48 @@
   letter-spacing: 4rpx;
 }
 
+/* 此念手札：一条发丝线下划书写行，聚焦时线加深、显示字数与隐私说明 */
+.note-entry {
+  margin-top: 48rpx;
+  padding-bottom: 14rpx;
+  border-bottom: 1rpx solid rgba(35, 33, 28, 0.18);
+  transition: border-color 0.2s ease;
+}
+
+.note-entry.focused {
+  border-bottom-color: rgba(35, 33, 28, 0.5);
+}
+
+.note-label {
+  color: #6b675c;
+  font-size: 24rpx;
+  font-family: "Songti SC", serif;
+  letter-spacing: 6rpx;
+}
+
+.note-input {
+  width: 100%;
+  min-height: 44rpx;
+  margin-top: 10rpx;
+  color: #23211c;
+  font-size: 28rpx;
+  line-height: 1.5;
+}
+
+.note-placeholder {
+  color: #b5aea2;
+  font-size: 26rpx;
+}
+
+.note-meta {
+  margin-top: 8rpx;
+  color: #b5aea2;
+  font-size: 20rpx;
+  text-align: right;
+}
+
 .guidance-panel {
-  margin-top: 96rpx;
+  margin-top: 72rpx;
 }
 
 .guidance-lead {
@@ -208,6 +248,30 @@
 
   .title {
     color: #f6efe2;
+  }
+
+  .note-entry {
+    border-bottom-color: rgba(216, 174, 103, 0.28);
+  }
+
+  .note-entry.focused {
+    border-bottom-color: rgba(216, 174, 103, 0.6);
+  }
+
+  .note-label {
+    color: rgba(216, 174, 103, 0.78);
+  }
+
+  .note-input {
+    color: rgba(246, 239, 226, 0.88);
+  }
+
+  .note-placeholder {
+    color: rgba(246, 239, 226, 0.35);
+  }
+
+  .note-meta {
+    color: rgba(246, 239, 226, 0.35);
   }
 
   .guidance-lead {

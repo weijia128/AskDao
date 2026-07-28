@@ -7,6 +7,7 @@ interface IAppOption {
 declare function App<T = Record<string, unknown>>(options: T): void
 declare function Page<T = Record<string, unknown>>(options: T): void
 declare function Component<T = Record<string, unknown>>(options: T): void
+declare function require(path: string): any
 
 interface CanvasGradientLike {
   addColorStop(stop: number, color: string): void
@@ -73,4 +74,5 @@ declare const wx: {
   reportAnalytics(eventName: string, data?: Record<string, unknown>): void
   getEnterOptionsSync?(): { scene: number; path?: string; query?: Record<string, string> }
   onKeyboardHeightChange?(callback: (res: { height: number }) => void): void
+  base64ToArrayBuffer(value: string): ArrayBuffer
 }

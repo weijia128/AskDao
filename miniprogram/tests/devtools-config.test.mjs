@@ -9,13 +9,10 @@ test('WeChat DevTools compiles TypeScript page entries', async () => {
   const appConfig = await readJson('../app.json')
 
   assert.deepEqual(projectConfig.setting.useCompilerPlugins, ['typescript'])
-  assert.equal(projectConfig.setting.packNpmManually, true)
-  assert.deepEqual(projectConfig.setting.packNpmRelationList, [
-    {
-      packageJsonPath: './package.json',
-      miniprogramNpmDistDir: './miniprogram/',
-    },
-  ])
+  // 历法数据改为构建期 .data.js 数据模块后，小程序无运行时 npm 依赖，
+  // 关闭手动 npm 打包，避免 DevTools 启动时查找不存在的 miniprogram_npm 产物。
+  assert.equal(projectConfig.setting.packNpmManually, false)
+  assert.equal(projectConfig.setting.packNpmRelationList, undefined)
 
   for (const page of appConfig.pages) {
     const pageScript = new URL(`../${page}.ts`, import.meta.url)

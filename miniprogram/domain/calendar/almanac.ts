@@ -1,14 +1,16 @@
-import { Solar } from 'lunar-javascript'
-
 import {
-  getDailyAlmanacFromSolar,
-  getLunarDateFromSolar,
+  getDailyAlmanacFromTables,
+  getLunarDateFromTable,
 } from './almanac.core'
+import lunarDaysTable from './lunar-days.data'
+import almanacTable from './almanac.data'
+
+const almanacActivityBytes = new Uint8Array(wx.base64ToArrayBuffer(almanacTable.activitySlots))
 
 export function getLunarDateFromLocalDateCore(date: Date = new Date()) {
-  return getLunarDateFromSolar(Solar, date)
+  return getLunarDateFromTable(lunarDaysTable, date)
 }
 
 export function getDailyAlmanac(date: Date = new Date()) {
-  return getDailyAlmanacFromSolar(Solar, date)
+  return getDailyAlmanacFromTables(lunarDaysTable, almanacTable, almanacActivityBytes, date)
 }

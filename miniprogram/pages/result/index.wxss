@@ -47,7 +47,8 @@
 }
 
 .card-back {
-  background: rgba(255, 255, 255, 0.1);
+  display: flex;
+  flex-direction: column;
   transform: rotateY(-180deg);
   overflow-y: auto;
 }
@@ -92,46 +93,83 @@
   text-align: center;
 }
 
-.tone-da-an .card-front {
+.tone-da-an .card-face {
   background:
     radial-gradient(circle at 50% 44%, rgba(243, 219, 154, 0.28), transparent 42%),
     linear-gradient(145deg, rgba(65, 100, 80, 0.94), rgba(29, 42, 35, 0.96));
   border-color: rgba(209, 221, 176, 0.46);
 }
 
-.tone-liu-lian .card-front {
+.tone-liu-lian .card-face {
   background:
     radial-gradient(circle at 48% 42%, rgba(227, 191, 119, 0.22), transparent 44%),
     linear-gradient(145deg, rgba(102, 93, 78, 0.94), rgba(42, 41, 39, 0.96));
   border-color: rgba(216, 174, 103, 0.38);
 }
 
-.tone-su-xi .card-front {
+.tone-su-xi .card-face {
   background:
     radial-gradient(circle at 52% 42%, rgba(255, 229, 157, 0.3), transparent 42%),
     linear-gradient(145deg, rgba(151, 74, 54, 0.94), rgba(81, 38, 31, 0.96));
   border-color: rgba(243, 219, 154, 0.46);
 }
 
-.tone-chi-kou .card-front {
+.tone-chi-kou .card-face {
   background:
     radial-gradient(circle at 52% 42%, rgba(213, 88, 70, 0.26), transparent 42%),
     linear-gradient(145deg, rgba(103, 40, 38, 0.94), rgba(40, 24, 24, 0.96));
   border-color: rgba(214, 99, 82, 0.44);
 }
 
-.tone-xiao-ji .card-front {
+.tone-xiao-ji .card-face {
   background:
     radial-gradient(circle at 50% 42%, rgba(243, 219, 154, 0.24), transparent 42%),
     linear-gradient(145deg, rgba(62, 111, 99, 0.94), rgba(28, 49, 46, 0.96));
   border-color: rgba(174, 217, 199, 0.42);
 }
 
-.tone-kong-wang .card-front {
+.tone-kong-wang .card-face {
   background:
     radial-gradient(circle at 50% 42%, rgba(214, 167, 92, 0.18), transparent 44%),
     linear-gradient(145deg, rgba(59, 65, 70, 0.94), rgba(17, 20, 22, 0.96));
   border-color: rgba(196, 201, 202, 0.3);
+}
+
+/* 背面为长文阅读区：同款渐变，径向光晕降到约 1/3 强度 */
+.tone-da-an .card-back {
+  background:
+    radial-gradient(circle at 50% 44%, rgba(243, 219, 154, 0.1), transparent 42%),
+    linear-gradient(145deg, rgba(65, 100, 80, 0.94), rgba(29, 42, 35, 0.96));
+}
+
+.tone-liu-lian .card-back {
+  background:
+    radial-gradient(circle at 48% 42%, rgba(227, 191, 119, 0.08), transparent 44%),
+    linear-gradient(145deg, rgba(102, 93, 78, 0.94), rgba(42, 41, 39, 0.96));
+}
+
+.tone-su-xi .card-back {
+  background:
+    radial-gradient(circle at 52% 42%, rgba(255, 229, 157, 0.11), transparent 42%),
+    linear-gradient(145deg, rgba(151, 74, 54, 0.94), rgba(81, 38, 31, 0.96));
+}
+
+.tone-chi-kou .card-back {
+  background:
+    radial-gradient(circle at 52% 42%, rgba(213, 88, 70, 0.09), transparent 42%),
+    linear-gradient(145deg, rgba(103, 40, 38, 0.94), rgba(40, 24, 24, 0.96));
+}
+
+.tone-xiao-ji .card-back {
+  background:
+    radial-gradient(circle at 50% 42%, rgba(243, 219, 154, 0.09), transparent 42%),
+    linear-gradient(145deg, rgba(62, 111, 99, 0.94), rgba(28, 49, 46, 0.96));
+}
+
+.tone-kong-wang .card-back {
+  background:
+    radial-gradient(circle at 50% 42%, rgba(214, 167, 92, 0.07), transparent 44%),
+    linear-gradient(145deg, rgba(59, 65, 70, 0.94), rgba(17, 20, 22, 0.96));
 }
 
 .card-save-button {
@@ -146,6 +184,25 @@
   font-weight: 600;
   line-height: 1.2;
   z-index: 6;
+}
+
+.flip-hint {
+  min-height: 40rpx;
+  margin-top: 18rpx;
+  color: rgba(243, 219, 154, 0.68);
+  font-size: 24rpx;
+  line-height: 40rpx;
+  text-align: center;
+}
+
+.repeat-notice {
+  margin-top: 18rpx;
+  padding: 16rpx 22rpx;
+  color: rgba(224, 122, 102, 0.9);
+  background: rgba(134, 42, 36, 0.08);
+  border-left: 4rpx solid rgba(214, 99, 82, 0.56);
+  font-size: 24rpx;
+  line-height: 1.55;
 }
 
 .method {
@@ -163,25 +220,32 @@
 }
 
 .oracle {
-  margin-top: 28rpx;
+  margin-top: 32rpx;
   color: #f3db9a;
   font-size: 34rpx;
   line-height: 1.45;
 }
 
 .text,
-.hint,
-.question,
-.disclaimer {
-  margin-top: 24rpx;
+.hint {
+  margin-top: 32rpx;
   color: rgba(246, 239, 226, 0.74);
   font-size: 28rpx;
   line-height: 1.62;
 }
 
+/* 正文组与免责声明分别用 auto 上边距吸收余量：
+   头部（方法/档位/签语）置顶，正文组居中偏上，免责声明沉底 */
+.text {
+  margin-top: auto;
+}
+
 .disclaimer {
+  margin-top: auto;
+  padding-top: 32rpx;
   color: rgba(246, 239, 226, 0.46);
   font-size: 22rpx;
+  line-height: 1.62;
 }
 
 .thought-entry {

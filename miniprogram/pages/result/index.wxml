@@ -22,9 +22,16 @@
       <view class="oracle">{{record.interpretation.oracleText}}</view>
       <view class="text">{{record.interpretation.explanation}}</view>
       <view class="hint">{{record.interpretation.actionHint}}</view>
-      <view class="question">{{record.interpretation.reflectionQuestion}}</view>
       <view class="disclaimer">{{record.interpretation.disclaimer}}</view>
     </view>
+  </view>
+
+  <view class="repeat-notice" wx:if="{{record && showRepeatNotice}}">
+    此时辰已取过象，结果与前次相同，不妨换个时辰再问。
+  </view>
+
+  <view class="flip-hint" wx:if="{{record}}">
+    {{isCardBackVisible ? '轻点卡面 · 翻回宫位' : '轻点卡面 · 翻看断课'}}
   </view>
 
   <view class="thought-entry" wx:if="{{record && !showThoughtNoteCard}}">

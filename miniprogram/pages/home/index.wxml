@@ -2,8 +2,10 @@
   <view class="paper-veil"></view>
 
   <view class="date-header">
-    <view class="date-ganzhi">{{almanac.ganzhiText}}</view>
-    <view class="date-lunar">{{almanac.lunarText}} · {{almanac.weekdayText}}</view>
+    <view class="date-ganzhi" wx:if="{{almanac.ganzhiText}}">{{almanac.ganzhiText}}</view>
+    <view class="date-lunar">
+      {{almanac.lunarText || almanac.solarText}} · {{almanac.weekdayText}}
+    </view>
   </view>
 
   <view class="hero">
@@ -34,24 +36,28 @@
       <view class="caption-text">今日黄历</view>
       <view class="caption-line"></view>
     </view>
-    <view class="almanac-meta">{{almanac.solarText}} · {{almanac.zodiacText}} · {{almanac.chongShaText}}</view>
+    <view class="almanac-meta" wx:if="{{almanac.zodiacText || almanac.chongShaText}}">
+      {{almanac.solarText}} · {{almanac.zodiacText}} · {{almanac.chongShaText}}
+    </view>
 
-    <view class="almanac-row">
+    <view class="almanac-row" wx:if="{{almanac.yi.length}}">
       <view class="almanac-label">宜</view>
       <view class="almanac-items">
         <text wx:for="{{almanac.yi}}" wx:key="*this" class="almanac-item">{{item}}</text>
       </view>
     </view>
 
-    <view class="almanac-row">
+    <view class="almanac-row" wx:if="{{almanac.ji.length}}">
       <view class="almanac-label muted">忌</view>
       <view class="almanac-items">
         <text wx:for="{{almanac.ji}}" wx:key="*this" class="almanac-item muted">{{item}}</text>
       </view>
     </view>
 
+    <view class="almanac-update-notice" wx:if="{{almanac.noticeText}}">{{almanac.noticeText}}</view>
+
     <view class="almanac-footer">
-      <view class="almanac-note">宜忌据 6tail/lunar-javascript 生成，仅供民俗参考。</view>
+      <view class="almanac-note" wx:if="{{!almanac.noticeText}}">宜忌据 6tail/lunar-javascript 生成，仅供民俗参考。</view>
       <view class="vermillion-seal">问</view>
     </view>
   </view>
