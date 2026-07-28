@@ -142,6 +142,54 @@
   margin-top: 52rpx;
 }
 
+.verify-panel {
+  margin: 0 0 32rpx;
+  padding: 32rpx 28rpx;
+  border: 1rpx solid rgba(122, 96, 54, 0.28);
+  border-radius: 16rpx;
+  background: rgba(255, 251, 240, 0.72);
+}
+
+.verify-time {
+  margin-top: 8rpx;
+  color: #6b5636;
+  font-size: 26rpx;
+}
+
+.verify-note {
+  margin-top: 12rpx;
+  color: #2f2a20;
+  font-size: 30rpx;
+  line-height: 1.6;
+}
+
+.verify-symbol {
+  margin-top: 12rpx;
+  color: #7a6036;
+  font-size: 26rpx;
+}
+
+.verify-actions {
+  display: flex;
+  gap: 16rpx;
+  margin-top: 28rpx;
+}
+
+.verify-action {
+  flex: 1;
+  padding: 18rpx 0;
+  color: #4a3d24;
+  border: 1rpx solid rgba(122, 96, 54, 0.36);
+  border-radius: 999rpx;
+  font-size: 26rpx;
+  text-align: center;
+}
+
+.verify-action.muted {
+  color: #8a7a5e;
+  border-color: rgba(122, 96, 54, 0.2);
+}
+
 .almanac-meta {
   margin-top: 20rpx;
   color: #6b675c;
@@ -237,6 +285,30 @@
 
 /* 深色模式：玄墨色板，随系统切换 */
 @media (prefers-color-scheme: dark) {
+  .verify-panel {
+    border-color: rgba(214, 199, 160, 0.2);
+    background: rgba(20, 22, 20, 0.62);
+  }
+
+  .verify-time,
+  .verify-symbol {
+    color: rgba(232, 222, 198, 0.62);
+  }
+
+  .verify-note {
+    color: #f2e9d4;
+  }
+
+  .verify-action {
+    color: #e8dec6;
+    border-color: rgba(214, 199, 160, 0.3);
+  }
+
+  .verify-action.muted {
+    color: rgba(232, 222, 198, 0.55);
+    border-color: rgba(214, 199, 160, 0.16);
+  }
+
   .page-shell > view.paper-veil {
     background: linear-gradient(180deg, #141614 0%, #0c0e0c 100%);
   }

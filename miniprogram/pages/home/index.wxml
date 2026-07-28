@@ -8,6 +8,24 @@
     </view>
   </view>
 
+  <view class="verify-panel" wx:if="{{dueRecord}}">
+    <view class="panel-caption">
+      <view class="caption-line"></view>
+      <view class="caption-text">验课</view>
+      <view class="caption-line"></view>
+    </view>
+    <view class="verify-time">{{dueRecordTimeText}}，你曾问过一事</view>
+    <view class="verify-note">此念：{{dueRecord.thought_note}}</view>
+    <view class="verify-symbol">
+      当时得 {{dueRecord.rule_result.symbol}} · {{dueRecord.rule_result.grade}}
+    </view>
+    <view class="verify-actions">
+      <view class="verify-action" data-action="fulfilled" bindtap="handleVerify">应验</view>
+      <view class="verify-action" data-action="unfulfilled" bindtap="handleVerify">未应验</view>
+      <view class="verify-action muted" data-action="defer" bindtap="handleVerify">尚未分晓</view>
+    </view>
+  </view>
+
   <view class="hero">
     <view class="taiji-entry" hover-class="taiji-entry-active" bindtap="handleStart">
       <view class="seal-ring">
