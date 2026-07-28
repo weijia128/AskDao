@@ -42,14 +42,19 @@ export function formatVerificationRange(records) {
     return ''
   }
 
-  // history 按新到旧存储：首元素最晚，末元素最早
-  const latest = formatCardDate(settled[0]?.rule_result?.created_at || settled[0]?.created_at || '')
-  const earliest = formatCardDate(
-    settled[settled.length - 1]?.rule_result?.created_at || settled[settled.length - 1]?.created_at || '',
-  )
+  const dates = settled
+    .map((record) => formatCardDate(record?.rule_result?.created_at || record?.created_at || ''))
+    .filter(Boolean)
+    .sort()
+  if (!dates.length) {
+    return ''
+  }
 
-  if (!earliest || !latest || earliest === latest) {
-    return latest || earliest
+  const earliest = dates[0]
+  const latest = dates[dates.length - 1]
+
+  if (earliest === latest) {
+    return latest
   }
 
   return `${earliest} — ${latest}`

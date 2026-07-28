@@ -51,6 +51,16 @@ test('时间跨度按东八区从最早到最晚', () => {
   assert.equal(range, '2026.07.21 — 2026.07.25')
 })
 
+test('时间跨度不依赖结论记录的输入顺序', () => {
+  const range = formatVerificationRange([
+    settled('b', 'fulfilled', '2026-07-20T16:00:00.000Z'),
+    settled('c', 'unfulfilled', '2026-07-24T16:00:00.000Z'),
+    settled('a', 'fulfilled', '2026-07-22T16:00:00.000Z'),
+  ])
+
+  assert.equal(range, '2026.07.21 — 2026.07.25')
+})
+
 test('只有一条结论时时间跨度只显示一个日期', () => {
   assert.equal(
     formatVerificationRange([settled('a', 'fulfilled', '2026-07-20T16:00:00.000Z')]),
