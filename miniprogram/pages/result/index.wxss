@@ -373,7 +373,9 @@
   border: 0;
 }
 
-.result-card-canvas {
+/* 需压过 app.wxss 中 .page-shell > canvas 的 position:relative，
+   否则离屏画布仍占据文档流，页面底部会多出 375x560 的空白 */
+.page-shell > canvas.result-card-canvas {
   position: fixed;
   top: -9999px;
   left: -9999px;
