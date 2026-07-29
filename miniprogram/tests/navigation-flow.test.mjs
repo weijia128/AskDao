@@ -20,7 +20,7 @@ test('main flow page navigation titles match the ritual sequence', async () => {
   const ritualJson = JSON.parse(await readText('../pages/xiao-liuren/index.json'))
   const resultJson = JSON.parse(await readText('../pages/result/index.json'))
 
-  assert.equal(homeJson.navigationBarTitleText, '问道')
+  assert.equal(homeJson.navigationBarTitleText, '一念六壬')
   assert.equal(ritualJson.navigationBarTitleText, '小六壬')
   assert.equal(resultJson.navigationBarTitleText, '断课')
 })
@@ -343,25 +343,30 @@ test('ritual page shows a center spinning wait state before auto navigating', as
   assert.match(ritualSource, /setTimeout/)
   assert.match(
     ritualSource,
-    /this\.runCountAnimation\(countPath, \(\) => \{[\s\S]*this\.navigateToResult\('\/pages\/result\/index'\)/
+    /this\.runCountAnimation\(countPath, \(\) => \{[\s\S]*this\.navigateToResult\(url\)/
   )
-  assert.match(ritualSource, /navigateToResult\(url: string\) {[\s\S]*wx\.navigateTo\(\{ url \}\)[\s\S]*setTimeout/)
-  assert.match(ritualSource, /this\.setData\(\{ isDivining: false, countSymbol: '' \}\)/)
+  assert.match(ritualSource, /navigateToResult\(url: string\) {[\s\S]*wx\.navigateTo\(\{[\s\S]*fail: \(\) => \{[\s\S]*wx\.redirectTo/)
+  assert.match(ritualSource, /this\.setData\(\{ isDivining: false, countSymbol: '', questionText: '', noteFocused: false \}\)/)
   assert.match(ritualSource, /\/pages\/result\/index/)
 })
 
-test('ritual page resolves repeats before enforcing the daily limit', async () => {
+test('every divination creates its own record, even on a same-period repeat', async () => {
   const ritualSource = await readText('../pages/xiao-liuren/index.ts')
 
   assert.match(ritualSource, /resolveDivinationAttempt/)
-  assert.match(ritualSource, /attempt\.outcome === 'repeat'/)
   assert.match(ritualSource, /attempt\.outcome === 'limit'/)
-  assert.ok(
-    ritualSource.indexOf("attempt.outcome === 'repeat'") < ritualSource.indexOf("attempt.outcome === 'limit'"),
-  )
+  assert.doesNotMatch(ritualSource, /attempt\.outcome === 'repeat'/)
+  assert.match(ritualSource, /attempt\.isRepeat/)
+
+  // 重复起念同样走完整起课链路：新记录、写历史、计次数
+  assert.match(ritualSource, /saveHistoryRecord\(record\)/)
   assert.match(ritualSource, /recordDailyDivination/)
+  assert.match(ritualSource, /thought_note: thoughtNote/)
   assert.match(ritualSource, /period_key: periodKey/)
-  assert.match(ritualSource, /\/pages\/result\/index\?repeat=1/)
+
+  // 重复仅作为展示提示带给结果页
+  assert.match(ritualSource, /attempt\.isRepeat \? '\/pages\/result\/index\?repeat=1' : '\/pages\/result\/index'/)
+  assert.match(ritualSource, /repeat_divination/)
   assert.match(ritualSource, /今日三问已满/)
 })
 

@@ -5,7 +5,7 @@ export function buildSharePosterModel(ruleResult: RuleResult, interpretation: In
   return {
     template_id: 'A01' as const,
     type: 'result' as const,
-    brand: '问道' as const,
+    brand: '一念六壬' as const,
     methodName: '小六壬' as const,
     grade: ruleResult.grade,
     symbol: ruleResult.symbol,

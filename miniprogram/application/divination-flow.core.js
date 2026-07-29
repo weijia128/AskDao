@@ -21,23 +21,20 @@ export function getRecordPeriodKey(record) {
   }
 }
 
+// 每一次起念都是独立一问：同时辰重复不再拦截复用，
+// 照常起课、存档、计次，只用 isRepeat 标记「结果与前次相同」作展示提示。
 export function resolveDivinationAttempt({ periodKey, latestRecord, dailyUsage }) {
-  if (periodKey && getRecordPeriodKey(latestRecord) === periodKey) {
-    return {
-      outcome: 'repeat',
-      record: latestRecord,
-    }
-  }
-
   if (!dailyUsage || dailyUsage.remaining <= 0) {
     return {
       outcome: 'limit',
-      record: null,
+      isRepeat: false,
     }
   }
 
+  const isRepeat = Boolean(periodKey) && getRecordPeriodKey(latestRecord) === periodKey
+
   return {
     outcome: 'proceed',
-    record: null,
+    isRepeat,
   }
 }

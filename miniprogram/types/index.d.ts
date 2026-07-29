@@ -29,7 +29,8 @@ interface CanvasContextLike {
 }
 
 declare const wx: {
-  navigateTo(options: { url: string }): void
+  navigateTo(options: { url: string; fail?: (err: unknown) => void }): void
+  redirectTo(options: { url: string; fail?: (err: unknown) => void }): void
   setStorageSync(key: string, value: unknown): void
   getStorageSync<T = any>(key: string): T
   removeStorageSync(key: string): void

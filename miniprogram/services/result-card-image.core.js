@@ -118,7 +118,7 @@ export function buildResultCardImageModel(record) {
   const symbol = record?.rule_result?.symbol || ''
 
   return {
-    brand: '问道',
+    brand: '一念六壬',
     methodName: '小六壬',
     backgroundImagePath: RESULT_CARD_BACKGROUND_IMAGE,
     miniProgramCodeUrl: record?.mini_program_code_url || '',

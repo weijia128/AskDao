@@ -67,7 +67,7 @@ export function buildVerificationCardModel(records) {
   }
 
   return {
-    brand: '问道',
+    brand: '一念六壬',
     title: '验课',
     rateText: `${summary.rate}%`,
     rateCaption: '应验率',

@@ -69,11 +69,18 @@ Page({
     tick()
   },
 
-  // 跳转后再重置起课态：让落宫宫位在页面转场期间保持显示，流程不断帧
+  // 跳转后再重置起课态：让落宫宫位在页面转场期间保持显示，流程不断帧。
+  // 同时清空此念：从结果页返回起念页时应是全新一问，不残留上次的输入。
   navigateToResult(url: string) {
-    wx.navigateTo({ url })
+    wx.navigateTo({
+      url,
+      fail: () => {
+        // navigateTo 静默失败时降级 redirectTo，保证流程不中断
+        wx.redirectTo({ url })
+      },
+    })
     setTimeout(() => {
-      this.setData({ isDivining: false, countSymbol: '' })
+      this.setData({ isDivining: false, countSymbol: '', questionText: '', noteFocused: false })
     }, 400)
   },
 
@@ -101,21 +108,6 @@ Page({
     const usage = getDailyDivinationUsage(wx, startedAtDate)
     const attempt = resolveDivinationAttempt({ periodKey, latestRecord, dailyUsage: usage })
 
-    if (attempt.outcome === 'repeat') {
-      this.setData({ isDivining: true })
-      track('repeat_divination', { symbol: latestRecord.rule_result.symbol })
-      const countPath = buildXiaoLiurenCountPath({
-        lunarMonth: latestRecord.rule_result.input_snapshot.lunar_month,
-        lunarDay: latestRecord.rule_result.input_snapshot.lunar_day,
-        hourIndex: latestRecord.rule_result.input_snapshot.hour_index,
-      })
-
-      this.runCountAnimation(countPath, () => {
-        this.navigateToResult('/pages/result/index?repeat=1')
-      })
-      return
-    }
-
     if (attempt.outcome === 'limit') {
       wx.showModal({
         title: '今日三问已满',
@@ -128,6 +120,11 @@ Page({
     const startedAt = startedAtDate.toISOString()
     const thoughtNote = this.data.questionText.trim()
     this.setData({ isDivining: true })
+
+    if (attempt.isRepeat) {
+      // 同时辰再起一念：照常起课存档计次，仅提示结果与前次相同
+      track('repeat_divination', { symbol: latestRecord?.rule_result?.symbol })
+    }
     track('start_divination', { method: 'xiao_liuren' })
 
     const result = await runXiaoLiurenDivination({
@@ -179,7 +176,8 @@ Page({
     })
 
     this.runCountAnimation(countPath, () => {
-      this.navigateToResult('/pages/result/index')
+      const url = attempt.isRepeat ? '/pages/result/index?repeat=1' : '/pages/result/index'
+      this.navigateToResult(url)
     })
   },
 })

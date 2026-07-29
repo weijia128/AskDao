@@ -19,40 +19,38 @@ function buildState(overrides = {}) {
   return {
     periodKey: '2026-07-27/5',
     latestRecord,
-    historyRecords: [latestRecord],
-    dailyUsage: { date: '2026-07-27', count: 3, remaining: 0, limit: 3 },
+    dailyUsage: { date: '2026-07-27', count: 1, remaining: 2, limit: 3 },
     ...overrides,
   }
 }
 
-test('repeat wins before a full daily limit and leaves stored state unchanged', () => {
-  const state = buildState()
-  const before = structuredClone(state)
-  const attempt = resolveDivinationAttempt(state)
+test('every divination proceeds as its own record, repeat is only a display flag', () => {
+  const attempt = resolveDivinationAttempt(buildState())
 
-  assert.equal(attempt.outcome, 'repeat')
-  assert.equal(attempt.record, state.latestRecord)
-  assert.deepEqual(state, before)
-  assert.equal(state.historyRecords.length, 1)
-  assert.equal(state.dailyUsage.count, 3)
-  assert.equal(state.latestRecord.id, 'record-1')
+  assert.equal(attempt.outcome, 'proceed')
+  assert.equal(attempt.isRepeat, true)
 })
 
-test('a full daily limit blocks a different period', () => {
-  const state = buildState({ periodKey: '2026-07-27/6' })
-  const attempt = resolveDivinationAttempt(state)
+test('a different period proceeds without the repeat flag', () => {
+  const attempt = resolveDivinationAttempt(buildState({ periodKey: '2026-07-27/6' }))
 
-  assert.equal(attempt.outcome, 'limit')
+  assert.equal(attempt.outcome, 'proceed')
+  assert.equal(attempt.isRepeat, false)
 })
 
-test('an available different period proceeds and consumes one attempt after success', () => {
+test('a full daily limit blocks every divination, including repeats', () => {
   const state = buildState({
-    periodKey: '2026-07-27/6',
-    dailyUsage: { date: '2026-07-27', count: 1, remaining: 2, limit: 3 },
+    dailyUsage: { date: '2026-07-27', count: 3, remaining: 0, limit: 3 },
   })
   const attempt = resolveDivinationAttempt(state)
 
-  assert.equal(attempt.outcome, 'proceed')
+  assert.equal(attempt.outcome, 'limit')
+  assert.equal(attempt.isRepeat, false)
+})
+
+test('missing or empty period key never flags a repeat', () => {
+  assert.equal(resolveDivinationAttempt(buildState({ periodKey: '' })).isRepeat, false)
+  assert.equal(resolveDivinationAttempt(buildState({ latestRecord: null })).isRepeat, false)
 })
 
 test('legacy records derive a period key from created time and hour index', () => {

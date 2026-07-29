@@ -32,7 +32,7 @@ test('result card image model excludes the private thought note', () => {
     thought_note: '我心里问的是一件私事',
   })
 
-  assert.equal(model.brand, '问道')
+  assert.equal(model.brand, '一念六壬')
   assert.equal(model.methodName, '小六壬')
   assert.equal(model.symbol, '大安')
   assert.deepEqual(model.symbolChars, ['大', '安'])

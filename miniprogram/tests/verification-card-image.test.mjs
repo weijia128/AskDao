@@ -33,7 +33,7 @@ test('验课卡汇总应验率与统计行', () => {
     settled('a', 'fulfilled', '2026-07-20T16:00:00.000Z'),
   ])
 
-  assert.equal(model.brand, '问道')
+  assert.equal(model.brand, '一念六壬')
   assert.equal(model.title, '验课')
   assert.equal(model.rateText, '67%')
   assert.equal(model.rateCaption, '应验率')
