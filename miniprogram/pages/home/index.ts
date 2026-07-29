@@ -2,7 +2,12 @@ import { track } from '../../services/analytics'
 import { buildShareReopenProperties } from '../../services/analytics.core'
 import { getDailyDivinationUsage } from '../../services/daily-limit.core'
 import { getDailyAlmanac } from '../../domain/calendar/almanac'
-import { getHistoryRecords, formatHistoryCreatedAt, updateHistoryRecord } from '../../services/storage'
+import {
+  getHistoryRecords,
+  formatHistoryCreatedAt,
+  syncLatestResultRecord,
+  updateHistoryRecord,
+} from '../../services/storage'
 import {
   buildVerificationPatch,
   getDueVerificationRecord,
@@ -133,7 +138,7 @@ Page({
     const status = action === 'defer' ? resolveDeferAction(record) : action
     const patch = buildVerificationPatch(status)
     updateHistoryRecord<VerificationRecord>(record.id, patch)
-    this.syncLatestResult(record.id, patch)
+    syncLatestResultRecord(record.id, patch)
 
     track('mark_verification', {
       status,
@@ -147,17 +152,6 @@ Page({
       this.refreshDueVerification()
       this.setData({ isProcessingVerification: false })
     })
-  },
-
-  // history 与 askdao_latest_result 是两份副本，命中最新记录时必须一起更新，
-  // 否则结果页读到的仍是未验证的旧对象。
-  syncLatestResult(recordId, patch) {
-    const latest = wx.getStorageSync('askdao_latest_result')
-    if (!latest || latest.id !== recordId) {
-      return
-    }
-
-    wx.setStorageSync('askdao_latest_result', { ...latest, ...patch })
   },
 
   handleOpenHistory() {

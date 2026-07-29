@@ -42,6 +42,12 @@ declare const wx: {
     success?: (res: { confirm: boolean; cancel: boolean }) => void
   }): void
   showToast(options: { title: string; icon?: 'success' | 'error' | 'loading' | 'none' }): void
+  showActionSheet(options: {
+    itemList: string[]
+    itemColor?: string
+    success?: (res: { tapIndex: number }) => void
+    fail?: (err: unknown) => void
+  }): void
   createCanvasContext(canvasId: string, component?: unknown): CanvasContextLike
   canvasToTempFilePath(
     options: {

@@ -33,11 +33,51 @@ test('首页标记验证后写回历史并同步最新记录副本', async () =>
   assert.match(homeSource, /buildVerificationPatch/)
   assert.match(homeSource, /resolveDeferAction/)
   assert.match(homeSource, /updateHistoryRecord/)
-  assert.match(homeSource, /syncLatestResult/)
-  assert.match(homeSource, /askdao_latest_result/)
+  assert.match(homeSource, /syncLatestResultRecord/)
   assert.match(homeSource, /refreshDueVerification/)
   assert.match(homeSource, /track\('view_verification_prompt'/)
   assert.match(homeSource, /track\('mark_verification'/)
+})
+
+test('最新记录副本的同步逻辑只有一份，收在 storage 层', async () => {
+  const storageSource = await readText('../services/storage.ts')
+  const homeSource = await readText('../pages/home/index.ts')
+  const historySource = await readText('../pages/history/index.ts')
+
+  assert.match(storageSource, /export function syncLatestResultRecord/)
+  assert.match(storageSource, /askdao_latest_result/)
+
+  // 两个页面都必须走共用函数，不得各自复制一份读改写
+  for (const pageSource of [homeSource, historySource]) {
+    assert.match(pageSource, /syncLatestResultRecord\(/)
+    assert.doesNotMatch(pageSource, /askdao_latest_result/)
+  }
+})
+
+test('问道录可点击记录改写验证状态', async () => {
+  const historyMarkup = await readText('../pages/history/index.wxml')
+  const historySource = await readText('../pages/history/index.ts')
+
+  assert.match(historyMarkup, /bindtap="handleEditVerification"/)
+
+  assert.match(historySource, /VERIFICATION_ACTIONS/)
+  assert.match(historySource, /'应验'/)
+  assert.match(historySource, /'未应验'/)
+  assert.match(historySource, /'尚未分晓'/)
+  assert.match(historySource, /wx\.showActionSheet/)
+  assert.match(historySource, /applyVerification/)
+  assert.match(historySource, /buildVerificationPatch/)
+  assert.match(historySource, /updateHistoryRecord/)
+  assert.match(historySource, /source: 'history'/)
+
+  // 已定论的记录也能改回来，窗口只管何时追问、不锁数据
+  assert.doesNotMatch(historySource, /isVerificationTerminal/)
+
+  // 滑动删除后紧跟的那次 tap 不能误开面板
+  assert.match(historySource, /swipedRecently/)
+
+  // 没写此念的记录不入验课，点了要给出解释而不是静默
+  assert.match(historySource, /此课未记此念，不入验课/)
 })
 
 test('首页验课拒绝渲染切换中的快速重复点击', async () => {

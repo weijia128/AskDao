@@ -4,8 +4,14 @@ import {
   deleteHistoryRecord,
   formatHistoryCreatedAt,
   getHistoryRecords,
+  syncLatestResultRecord,
+  updateHistoryRecord,
 } from '../../services/storage'
-import { getVerificationLabel, summarizeVerifications } from '../../domain/verification/verification'
+import {
+  buildVerificationPatch,
+  getVerificationLabel,
+  summarizeVerifications,
+} from '../../domain/verification/verification'
 import {
   buildVerificationCardModel,
   VERIFICATION_CARD_CODE_SLOT,
@@ -16,7 +22,16 @@ import {
 
 const SWIPE_OPEN_THRESHOLD = 48
 const SWIPE_CLOSE_THRESHOLD = 24
+const SWIPE_TAP_TOLERANCE = 10
 const VERIFICATION_CARD_CANVAS_ID = 'verificationCardCanvas'
+
+// 记录页直接改状态：窗口只决定首页何时主动追问，不锁定数据。
+// 「尚未分晓」在这里固定落到 deferred，让它日后仍可被追问。
+const VERIFICATION_ACTIONS = [
+  { label: '应验', status: 'fulfilled' },
+  { label: '未应验', status: 'unfulfilled' },
+  { label: '尚未分晓', status: 'deferred' },
+]
 
 function buildDisplayRecords(records) {
   return records.map((record) => ({
@@ -69,6 +84,9 @@ Page({
     }
 
     const deltaX = touch.clientX - this.data.touchStartX
+    // 横向滑动之后紧跟着会冒出一次 tap，别让它误开状态选择面板
+    this.swipedRecently = Math.abs(deltaX) > SWIPE_TAP_TOLERANCE
+
     if (deltaX < -SWIPE_OPEN_THRESHOLD) {
       this.setData({ openedRecordId: recordId })
       return
@@ -77,6 +95,53 @@ Page({
     if (deltaX > SWIPE_CLOSE_THRESHOLD) {
       this.setData({ openedRecordId: '' })
     }
+  },
+
+  handleEditVerification(event) {
+    const recordId = event.currentTarget?.dataset?.id
+    if (!recordId || this.swipedRecently) {
+      return
+    }
+
+    if (this.data.openedRecordId) {
+      this.setData({ openedRecordId: '' })
+      return
+    }
+
+    const record = this.data.records.find((item) => item.id === recordId)
+    if (!record) {
+      return
+    }
+
+    if (!`${record.thought_note || ''}`.trim()) {
+      wx.showToast({ title: '此课未记此念，不入验课', icon: 'none' })
+      return
+    }
+
+    wx.showActionSheet({
+      itemList: VERIFICATION_ACTIONS.map((action) => action.label),
+      success: (res) => {
+        const action = VERIFICATION_ACTIONS[res.tapIndex]
+        if (action) {
+          this.applyVerification(recordId, action.status)
+        }
+      },
+      fail: () => {},
+    })
+  },
+
+  applyVerification(recordId, status) {
+    const patch = buildVerificationPatch(status)
+    const rawRecords = updateHistoryRecord(recordId, patch)
+    syncLatestResultRecord(recordId, patch)
+
+    this.setData({
+      records: buildDisplayRecords(rawRecords),
+      summary: summarizeVerifications(rawRecords),
+      openedRecordId: '',
+    })
+    track('mark_verification', { status, source: 'history' })
+    wx.showToast({ title: '已更新', icon: 'none' })
   },
 
   handleDeleteRecord(event) {
