@@ -31,6 +31,20 @@ test('不满三日的记录不进入待验', () => {
   assert.equal(isVerificationDue(createRecord(), at('2026-07-22T16:00:00.000Z')), false)
 })
 
+// 其余用例都锚在上海午夜整点、相差整日，偏移常数会被差值抵消，
+// 因此即便把 SHANGHAI_OFFSET_MS 改成 0 也照样全绿。这条不对齐日界：
+// 上海 07-20 23:00 起课，07-23 01:00 查看 —— 真实仅 50 小时，
+// 却已跨三个上海日界。按日历日应待验，按滚动 72 小时则不应。
+test('按上海日历日计数，不足七十二小时也可能已满三日', () => {
+  const createdAt = '2026-07-20T15:00:00.000Z'
+  const record = createRecord({
+    created_at: createdAt,
+    rule_result: { symbol: '大安', grade: '顺', created_at: createdAt },
+  })
+
+  assert.equal(isVerificationDue(record, at('2026-07-22T17:00:00.000Z')), true)
+})
+
 test('没有写此念的记录永不进入待验', () => {
   const record = createRecord({ thought_note: '   ' })
 
