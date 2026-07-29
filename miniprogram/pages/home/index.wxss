@@ -94,10 +94,6 @@
   text-align: center;
 }
 
-.rules-panel {
-  margin-top: 52rpx;
-}
-
 .panel-caption {
   display: flex;
   align-items: center;
@@ -115,27 +111,6 @@
   font-size: 24rpx;
   font-family: "Songti SC", serif;
   letter-spacing: 8rpx;
-}
-
-.rule-row {
-  display: flex;
-  align-items: baseline;
-  margin-top: 24rpx;
-}
-
-.rule-title {
-  flex: 0 0 170rpx;
-  color: #23211c;
-  font-size: 30rpx;
-  font-family: "Songti SC", serif;
-  font-weight: 600;
-}
-
-.rule-text {
-  flex: 1;
-  color: #6b675c;
-  font-size: 26rpx;
-  line-height: 1.5;
 }
 
 .almanac-panel {
@@ -339,14 +314,6 @@
 
   .caption-text {
     color: rgba(216, 174, 103, 0.78);
-  }
-
-  .rule-title {
-    color: #f6efe2;
-  }
-
-  .rule-text {
-    color: rgba(246, 239, 226, 0.58);
   }
 
   .almanac-meta {

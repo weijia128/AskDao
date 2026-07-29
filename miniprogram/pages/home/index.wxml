@@ -36,18 +36,6 @@
     <view class="ritual-limit">{{dailyLimitText}}</view>
   </view>
 
-  <view class="rules-panel">
-    <view class="panel-caption">
-      <view class="caption-line"></view>
-      <view class="caption-text">占前须知</view>
-      <view class="caption-line"></view>
-    </view>
-    <view wx:for="{{ritualRules}}" wx:key="title" class="rule-row">
-      <view class="rule-title">{{item.title}}</view>
-      <view class="rule-text">{{item.text}}</view>
-    </view>
-  </view>
-
   <view class="almanac-panel">
     <view class="panel-caption">
       <view class="caption-line"></view>

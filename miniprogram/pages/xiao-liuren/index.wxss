@@ -44,7 +44,24 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-top: 104rpx;
+  margin-top: 72rpx;
+}
+
+/* 三不占：与遇事不决同款发丝横线行，一行收束 */
+.rules-row {
+  display: flex;
+  align-items: center;
+  margin-top: 28rpx;
+}
+
+.rules-text {
+  padding: 0 24rpx;
+  color: #4a463e;
+  font-size: 26rpx;
+  font-family: "Songti SC", serif;
+  font-weight: 600;
+  letter-spacing: 4rpx;
+  white-space: nowrap;
 }
 
 .ritual-action {
@@ -132,7 +149,7 @@
 }
 
 .title {
-  margin-top: 56rpx;
+  margin-top: 44rpx;
   color: #23211c;
   font-size: 40rpx;
   font-family: "Songti SC", serif;
@@ -180,7 +197,7 @@
 }
 
 .guidance-panel {
-  margin-top: 72rpx;
+  margin-top: 56rpx;
 }
 
 .guidance-lead {
@@ -223,6 +240,10 @@
 
   .caption-text {
     color: rgba(216, 174, 103, 0.78);
+  }
+
+  .rules-text {
+    color: rgba(246, 239, 226, 0.85);
   }
 
   .spinning-ring {

@@ -102,6 +102,8 @@ test('history page shows generated time and supports swipe deletion', async () =
   assert.match(storageSource, /removeHistoryRecord/)
 
   assert.match(historyStyles, /translateX\(-154rpx\)/)
+  assert.match(historyStyles, /translateX\(-308rpx\)/)
+  assert.match(historyStyles, /\.has-card-action/)
   assert.match(historyStyles, /\.delete-action/)
   assert.match(historyStyles, /\.delete-action\s*{[\s\S]*background: rgba\(15, 17, 15, 0\.42\);/)
   assert.doesNotMatch(historyStyles, /background: rgba\(134, 42, 36/)
@@ -298,6 +300,37 @@ test('ritual page teaches how to ask before showing the result', async () => {
   assert.match(ritualMarkup, /宜问：这件事今天推进，是否合适？/)
   assert.match(ritualMarkup, /不宜问：我应该怎么办？/)
   assert.match(ritualMarkup, /不以玩笑试探，不反复追问同一事。/)
+})
+
+test('占前须知移到起念页，三不占作横线行、无解释', async () => {
+  const homeMarkup = await readText('../pages/home/index.wxml')
+  const homeSource = await readText('../pages/home/index.ts')
+  const homeStyles = await readText('../pages/home/index.wxss')
+  const ritualMarkup = await readText('../pages/xiao-liuren/index.wxml')
+  const ritualStyles = await readText('../pages/xiao-liuren/index.wxss')
+
+  // 起念页：三不占与「遇事不决，六壬决断」同款横线行，紧随其后
+  assert.match(ritualMarkup, /遇事不决，六壬决断[\s\S]*?不诚不占/)
+  assert.match(ritualMarkup, /rules-row/)
+  assert.match(ritualMarkup, /不诚不占/)
+  assert.match(ritualMarkup, /不疑不占/)
+  assert.match(ritualMarkup, /不义不占/)
+  assert.match(ritualStyles, /\.rules-row\s*{[^}]*display:\s*flex/)
+  assert.match(ritualStyles, /\.rules-text/)
+
+  // 只占位一行：无标题栏、无解释文字、无三行版式
+  assert.doesNotMatch(ritualMarkup, /占前须知/)
+  assert.doesNotMatch(ritualMarkup, /心不诚/)
+  assert.doesNotMatch(ritualMarkup, /事无疑/)
+  assert.doesNotMatch(ritualMarkup, /所问不义/)
+  assert.doesNotMatch(ritualMarkup, /rule-text/)
+  assert.doesNotMatch(ritualStyles, /\.rule-text/)
+
+  // 首页：整块移除，连样式与数据都不留
+  assert.doesNotMatch(homeMarkup, /占前须知/)
+  assert.doesNotMatch(homeMarkup, /rules-panel/)
+  assert.doesNotMatch(homeSource, /ritualRules/)
+  assert.doesNotMatch(homeStyles, /\.rule-row/)
 })
 
 test('ritual page starts divination instead of asking user to view result', async () => {

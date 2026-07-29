@@ -7,6 +7,12 @@
     <view class="caption-line"></view>
   </view>
 
+  <view class="rules-row">
+    <view class="caption-line"></view>
+    <view class="rules-text">不诚不占 · 不疑不占 · 不义不占</view>
+    <view class="caption-line"></view>
+  </view>
+
   <view class="ritual-hero">
     <view class="ritual-action {{isDivining ? 'active' : ''}}" hover-class="ritual-action-hover" bindtap="handleDivine">
       <view class="spinning-ring" wx:if="{{isDivining}}"></view>

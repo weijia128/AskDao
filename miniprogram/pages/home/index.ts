@@ -50,20 +50,6 @@ const emptyAlmanac = {
 
 Page({
   data: {
-    ritualRules: [
-      {
-        title: '不诚不占',
-        text: '心不诚，则象不明。',
-      },
-      {
-        title: '不疑不占',
-        text: '事无疑，则不必问。',
-      },
-      {
-        title: '不义不占',
-        text: '所问不义，则不取象。',
-      },
-    ],
     dailyLimitText: '',
     almanac: emptyAlmanac,
     dueRecord: null,
