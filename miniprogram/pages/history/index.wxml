@@ -8,11 +8,17 @@
   <view
     wx:for="{{records}}"
     wx:key="id"
-    class="history-swipe-row {{openedRecordId == item.id ? 'open' : ''}}"
+    class="history-swipe-row {{openedRecordId == item.id ? 'open' : ''}} {{item.verification.status == 'fulfilled' ? 'has-card-action' : ''}}"
     data-id="{{item.id}}"
     bindtouchstart="handleTouchStart"
     bindtouchend="handleTouchEnd"
   >
+    <view
+      class="card-action"
+      wx:if="{{item.verification.status == 'fulfilled'}}"
+      data-id="{{item.id}}"
+      catchtap="handleSaveRecordCard"
+    >存卡</view>
     <view class="delete-action" data-id="{{item.id}}" catchtap="handleDeleteRecord">删除</view>
     <view class="history-card-track">
       <view class="history-card" data-id="{{item.id}}" bindtap="handleEditVerification">
@@ -31,12 +37,23 @@
     class="verify-card-button"
     wx:if="{{summary.settled}}"
     bindtap="handleSaveVerificationCard"
-  >保存验课卡</view>
+  >保存应验总览</view>
 
   <view
     class="clear-all-button"
     wx:if="{{records.length}}"
     bindtap="handleClearAllRecords"
   >清除全部记录</view>
+
+  <view class="card-preview-mask" wx:if="{{showCardPreview}}">
+    <view class="card-preview">
+      <image class="card-preview-image" src="{{previewCardPath}}" mode="aspectFit" />
+      <view class="card-preview-actions">
+        <view class="card-preview-cancel" bindtap="handleCancelRecordCardPreview">取消</view>
+        <view class="card-preview-save" bindtap="handleConfirmSaveRecordCard">保存到相册</view>
+      </view>
+    </view>
+  </view>
+
   <canvas class="verification-card-canvas" canvas-id="verificationCardCanvas"></canvas>
 </view>

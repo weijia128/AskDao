@@ -14,6 +14,7 @@ export type AnalyticsEvent =
   | 'view_verification_prompt'
   | 'mark_verification'
   | 'save_verification_card'
+  | 'save_verification_record_card'
   | 'share_click'
   | 'reopen_from_share'
   | 'view_history'

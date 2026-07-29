@@ -39,6 +39,7 @@ declare const wx: {
     content?: string
     showCancel?: boolean
     confirmText?: string
+    cancelText?: string
     confirmColor?: string
     success?: (res: { confirm: boolean; cancel: boolean }) => void
   }): void

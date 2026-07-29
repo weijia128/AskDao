@@ -19,6 +19,13 @@ import {
   VERIFICATION_CARD_TONE,
   VERIFICATION_CARD_WIDTH,
 } from '../../services/verification-card-image.core'
+import {
+  buildVerificationRecordCardModel,
+  canExportVerificationCard,
+  drawVerificationRecordCard,
+  VERIFICATION_RECORD_CARD_HEIGHT,
+  VERIFICATION_RECORD_CARD_WIDTH,
+} from '../../services/verification-record-card.core'
 
 const SWIPE_OPEN_THRESHOLD = 48
 const SWIPE_CLOSE_THRESHOLD = 24
@@ -49,6 +56,9 @@ Page({
     touchStartX: 0,
     touchRecordId: '',
     isBuildingCard: false,
+    showCardPreview: false,
+    previewCardPath: '',
+    previewCardSymbol: '',
   },
 
   onShow() {
@@ -113,11 +123,6 @@ Page({
       return
     }
 
-    if (!`${record.thought_note || ''}`.trim()) {
-      wx.showToast({ title: '此课未记此念，不入验课', icon: 'none' })
-      return
-    }
-
     wx.showActionSheet({
       itemList: VERIFICATION_ACTIONS.map((action) => action.label),
       success: (res) => {
@@ -141,6 +146,14 @@ Page({
       openedRecordId: '',
     })
     track('mark_verification', { status, source: 'history' })
+
+    if (status === 'fulfilled') {
+      // 应验的瞬间是分享动机最强的时刻，直接出验课卡预览，存不存由卡片上的按钮决定
+      wx.showToast({ title: '已记下应验', icon: 'none' })
+      this.saveRecordCard(recordId)
+      return
+    }
+
     wx.showToast({ title: '已更新', icon: 'none' })
   },
 
@@ -289,6 +302,107 @@ Page({
       this.setData({ isBuildingCard: false })
       wx.showToast({ title: '生成失败', icon: 'none' })
     }
+  },
+
+  handleSaveRecordCard(event) {
+    const recordId = event?.currentTarget?.dataset?.id
+    if (recordId) {
+      this.setData({ openedRecordId: '' })
+      this.saveRecordCard(recordId)
+    }
+  },
+
+  buildVerificationRecordCardImage(record) {
+    const model = buildVerificationRecordCardModel(record)
+    if (!model) {
+      return Promise.reject(new Error('Record not fulfilled'))
+    }
+
+    const ctx = wx.createCanvasContext(VERIFICATION_CARD_CANVAS_ID, this)
+    drawVerificationRecordCard(ctx, model)
+
+    return new Promise((resolve, reject) => {
+      ctx.draw(false, () => {
+        wx.canvasToTempFilePath(
+          {
+            canvasId: VERIFICATION_CARD_CANVAS_ID,
+            width: VERIFICATION_RECORD_CARD_WIDTH,
+            height: VERIFICATION_RECORD_CARD_HEIGHT,
+            destWidth: VERIFICATION_RECORD_CARD_WIDTH * 2,
+            destHeight: VERIFICATION_RECORD_CARD_HEIGHT * 2,
+            fileType: 'jpg',
+            quality: 0.92,
+            success: (res) => resolve(res.tempFilePath),
+            fail: reject,
+          },
+          this,
+        )
+      })
+    })
+  },
+
+  async saveRecordCard(recordId) {
+    if (this.data.isBuildingCard || this.data.showCardPreview) {
+      return
+    }
+
+    const record = getHistoryRecords<{ id: string; rule_result?: { symbol?: string } }>()
+      .find((item) => item.id === recordId)
+    if (!canExportVerificationCard(record)) {
+      wx.showToast({ title: '此课尚未应验', icon: 'none' })
+      return
+    }
+
+    this.setData({ isBuildingCard: true })
+
+    try {
+      // 先出预览，存不存由用户在预览里决定
+      const imagePath = await this.buildVerificationRecordCardImage(record)
+      this.setData({
+        isBuildingCard: false,
+        openedRecordId: '',
+        showCardPreview: true,
+        previewCardPath: imagePath,
+        previewCardSymbol: record?.rule_result?.symbol || '',
+      })
+    } catch (error) {
+      console.error('Build verification record card failed:', error)
+      this.setData({ isBuildingCard: false })
+      wx.showToast({ title: '生成失败', icon: 'none' })
+    }
+  },
+
+  handleConfirmSaveRecordCard() {
+    const { previewCardPath, previewCardSymbol } = this.data
+    if (!previewCardPath) {
+      return
+    }
+
+    wx.saveImageToPhotosAlbum({
+      filePath: previewCardPath,
+      success: () => {
+        track('save_verification_record_card', { symbol: previewCardSymbol })
+        wx.showToast({ title: '已保存到相册', icon: 'success' })
+      },
+      fail: () => {
+        wx.showToast({ title: '保存失败', icon: 'none' })
+      },
+      complete: () => {
+        this.closeRecordCardPreview()
+      },
+    })
+  },
+
+  handleCancelRecordCardPreview() {
+    this.closeRecordCardPreview()
+  },
+
+  closeRecordCardPreview() {
+    this.setData({
+      showCardPreview: false,
+      previewCardPath: '',
+      previewCardSymbol: '',
+    })
   },
 
   handleClearAllRecords() {

@@ -76,8 +76,8 @@ test('问道录可点击记录改写验证状态', async () => {
   // 滑动删除后紧跟的那次 tap 不能误开面板
   assert.match(historySource, /swipedRecently/)
 
-  // 没写此念的记录不入验课，点了要给出解释而不是静默
-  assert.match(historySource, /此课未记此念，不入验课/)
+  // 未记此念的记录同样可以标记验课、进而存卡
+  assert.doesNotMatch(historySource, /此课未记此念，不入验课/)
 })
 
 test('首页验课拒绝渲染切换中的快速重复点击', async () => {
@@ -95,6 +95,7 @@ test('验证事件已登记到分析事件表', async () => {
   assert.match(analyticsSource, /'view_verification_prompt'/)
   assert.match(analyticsSource, /'mark_verification'/)
   assert.match(analyticsSource, /'save_verification_card'/)
+  assert.match(analyticsSource, /'save_verification_record_card'/)
 })
 
 test('验课闭环不引入签到打卡类机制', async () => {
@@ -126,14 +127,15 @@ test('问道录展示每条记录的验证状态与累计应验率', async () =>
   assert.match(historyStyles, /\.verify-tag/)
 })
 
-test('问道录可导出验课卡并保存到相册', async () => {
+test('问道录可导出应验总览卡并保存到相册', async () => {
   const historyMarkup = await readText('../pages/history/index.wxml')
   const historySource = await readText('../pages/history/index.ts')
   const historyStyles = await readText('../pages/history/index.wxss')
 
   assert.match(historyMarkup, /verificationCardCanvas/)
   assert.match(historyMarkup, /verify-card-button/)
-  assert.match(historyMarkup, /保存验课卡/)
+  assert.match(historyMarkup, /保存应验总览/)
+  assert.doesNotMatch(historyMarkup, /保存验课卡/)
   assert.match(historyMarkup, /bindtap="handleSaveVerificationCard"/)
   assert.match(historyMarkup, /wx:if="\{\{summary\.settled\}\}"/)
 
@@ -149,6 +151,43 @@ test('问道录可导出验课卡并保存到相册', async () => {
     /\.page-shell\s*>\s*canvas\.verification-card-canvas\s*\{[^}]*position:\s*fixed;/,
   )
   assert.match(historyStyles, /\.verify-card-button/)
+})
+
+test('应验记录存卡前先出预览，预览中再保存', async () => {
+  const historyMarkup = await readText('../pages/history/index.wxml')
+  const historySource = await readText('../pages/history/index.ts')
+  const historyStyles = await readText('../pages/history/index.wxss')
+
+  // 应验行左滑露出「存卡」按钮，catchtap 避免触发改状态
+  assert.match(historyMarkup, /catchtap="handleSaveRecordCard"/)
+  assert.match(historyMarkup, /wx:if="\{\{item\.verification\.status == 'fulfilled'\}\}"/)
+  assert.match(historyMarkup, /存卡/)
+  assert.match(historyMarkup, /has-card-action/)
+
+  // 预览浮层：卡图 + 保存/取消两个出口
+  assert.match(historyMarkup, /card-preview/)
+  assert.match(historyMarkup, /\{\{previewCardPath\}\}/)
+  assert.match(historyMarkup, /bindtap="handleConfirmSaveRecordCard"/)
+  assert.match(historyMarkup, /bindtap="handleCancelRecordCardPreview"/)
+
+  // 点存卡只构建预览图并打开浮层，保存发生在预览确认时
+  assert.match(historySource, /buildVerificationRecordCardModel/)
+  assert.match(historySource, /drawVerificationRecordCard/)
+  assert.match(historySource, /handleSaveRecordCard/)
+  assert.match(historySource, /previewCardPath/)
+  assert.match(historySource, /handleConfirmSaveRecordCard/)
+  assert.match(historySource, /handleCancelRecordCardPreview/)
+  assert.match(historySource, /track\('save_verification_record_card'/)
+  assert.match(historySource, /此课尚未应验/)
+
+  // 标记应验后直接出验课卡预览，在卡片上选择是否保存，不用弹窗打断
+  assert.doesNotMatch(historySource, /要存一张验课卡吗/)
+  assert.match(historySource, /status === 'fulfilled'[\s\S]{0,200}saveRecordCard\(recordId\)/)
+
+  // 预览遮罩必须用高优先级选择器压过 app.wxss 的 .page-shell > view position:relative，
+  // 否则 fixed 失效，预览会掉进文档流末尾（页面最底部）
+  assert.match(historyStyles, /\.page-shell\s*>\s*view\.card-preview-mask\s*{[^}]*position:\s*fixed/)
+  assert.match(historyStyles, /\.card-preview/)
 })
 
 test('验课卡不写入任何此念原文', async () => {
