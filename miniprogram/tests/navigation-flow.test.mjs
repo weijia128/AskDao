@@ -155,6 +155,19 @@ test('share button width includes its padding so it stays inside the shell', asy
   assert.match(resultStyles, /\.share-button\s*\{[^}]*box-sizing:\s*border-box/)
 })
 
+test('home and ritual pages can be forwarded and shared to moments', async () => {
+  const homeSource = await readText('../pages/home/index.ts')
+  const ritualSource = await readText('../pages/xiao-liuren/index.ts')
+
+  for (const source of [homeSource, ritualSource]) {
+    assert.match(source, /onShareAppMessage/)
+    assert.match(source, /onShareTimeline/)
+    assert.match(source, /buildSharePath/)
+    assert.match(source, /buildShareTimelineQuery/)
+    assert.match(source, /一念六壬 · 起课问道/)
+  }
+})
+
 test('result page shares the generated result card image instead of the app entry', async () => {
   const resultMarkup = await readText('../pages/result/index.wxml')
   const resultSource = await readText('../pages/result/index.ts')

@@ -10,6 +10,7 @@ import { getCurrentChineseHour } from '../../domain/calendar/chinese-hour'
 import { saveHistoryRecord } from '../../services/storage'
 import { track } from '../../services/analytics'
 import { getDailyDivinationUsage, recordDailyDivination } from '../../services/daily-limit.core'
+import { buildSharePath, buildShareTimelineQuery } from '../../services/wx-share'
 
 const ANIMATION_SETTLE_MS = 450
 
@@ -179,5 +180,21 @@ Page({
       const url = attempt.isRepeat ? '/pages/result/index?repeat=1' : '/pages/result/index'
       this.navigateToResult(url)
     })
+  },
+
+  onShareAppMessage() {
+    track('share_click', { channel: 'session', page: 'ritual' })
+    return {
+      title: '一念六壬 · 起课问道',
+      path: buildSharePath(),
+    }
+  },
+
+  onShareTimeline() {
+    track('share_click', { channel: 'timeline', page: 'ritual' })
+    return {
+      title: '一念六壬 · 起课问道',
+      query: buildShareTimelineQuery(),
+    }
   },
 })

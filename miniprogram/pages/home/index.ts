@@ -1,6 +1,7 @@
 import { track } from '../../services/analytics'
 import { buildShareReopenProperties } from '../../services/analytics.core'
 import { getDailyDivinationUsage } from '../../services/daily-limit.core'
+import { buildSharePath, buildShareTimelineQuery } from '../../services/wx-share'
 import { getDailyAlmanac } from '../../domain/calendar/almanac'
 import {
   getHistoryRecords,
@@ -142,5 +143,21 @@ Page({
 
   handleOpenHistory() {
     wx.navigateTo({ url: '/pages/history/index' })
+  },
+
+  onShareAppMessage() {
+    track('share_click', { channel: 'session', page: 'home' })
+    return {
+      title: '一念六壬 · 起课问道',
+      path: buildSharePath(),
+    }
+  },
+
+  onShareTimeline() {
+    track('share_click', { channel: 'timeline', page: 'home' })
+    return {
+      title: '一念六壬 · 起课问道',
+      query: buildShareTimelineQuery(),
+    }
   },
 })
