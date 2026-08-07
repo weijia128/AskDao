@@ -59,6 +59,7 @@ Page({
     showCardPreview: false,
     previewCardPath: '',
     previewCardSymbol: '',
+    previewRecordId: '',
   },
 
   onShow() {
@@ -123,6 +124,16 @@ Page({
       return
     }
 
+    // 已应验的记录点按直接看验课卡，不再弹状态问询；改状态入口收在卡片预览里
+    if (record?.verification?.status === 'fulfilled') {
+      this.saveRecordCard(recordId)
+      return
+    }
+
+    this.openVerificationSheet(recordId)
+  },
+
+  openVerificationSheet(recordId) {
     wx.showActionSheet({
       itemList: VERIFICATION_ACTIONS.map((action) => action.label),
       success: (res) => {
@@ -364,6 +375,7 @@ Page({
         showCardPreview: true,
         previewCardPath: imagePath,
         previewCardSymbol: record?.rule_result?.symbol || '',
+        previewRecordId: recordId,
       })
     } catch (error) {
       console.error('Build verification record card failed:', error)
@@ -397,11 +409,21 @@ Page({
     this.closeRecordCardPreview()
   },
 
+  handlePreviewEditVerification() {
+    // 应验卡的改状态入口：先收下浮层，再弹状态选择
+    const recordId = this.data.previewRecordId
+    this.closeRecordCardPreview()
+    if (recordId) {
+      this.openVerificationSheet(recordId)
+    }
+  },
+
   closeRecordCardPreview() {
     this.setData({
       showCardPreview: false,
       previewCardPath: '',
       previewCardSymbol: '',
+      previewRecordId: '',
     })
   },
 

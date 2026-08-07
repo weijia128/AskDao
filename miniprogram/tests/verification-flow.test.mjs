@@ -70,7 +70,7 @@ test('问道录可点击记录改写验证状态', async () => {
   assert.match(historySource, /updateHistoryRecord/)
   assert.match(historySource, /source: 'history'/)
 
-  // 已定论的记录也能改回来，窗口只管何时追问、不锁数据
+  // 已定论的记录也能改回来（应验记录经预览浮层的「改记验课」进入同一选择面板），窗口只管何时追问、不锁数据
   assert.doesNotMatch(historySource, /isVerificationTerminal/)
 
   // 滑动删除后紧跟的那次 tap 不能误开面板
@@ -163,6 +163,13 @@ test('应验记录存卡前先出预览，预览中再保存', async () => {
   assert.match(historyMarkup, /wx:if="\{\{item\.verification\.status == 'fulfilled'\}\}"/)
   assert.match(historyMarkup, /存卡/)
   assert.match(historyMarkup, /has-card-action/)
+
+  // 已应验的记录点按直接出验课卡预览，不再弹状态问询；改状态入口收在预览浮层
+  assert.match(historySource, /handleEditVerification[\s\S]{0,600}status === 'fulfilled'[\s\S]{0,120}saveRecordCard\(recordId\)/)
+  assert.match(historyMarkup, /catchtap="handlePreviewEditVerification"/)
+  assert.match(historyMarkup, /改记验课/)
+  assert.match(historySource, /handlePreviewEditVerification/)
+  assert.match(historySource, /openVerificationSheet/)
 
   // 预览浮层：卡图 + 保存/取消两个出口
   assert.match(historyMarkup, /card-preview/)
