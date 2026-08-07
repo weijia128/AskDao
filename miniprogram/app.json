@@ -7,12 +7,11 @@
   ],
   "window": {
     "navigationBarTitleText": "一念六壬",
-    "navigationBarBackgroundColor": "@navBgColor",
-    "navigationBarTextStyle": "@navTxtStyle",
-    "backgroundColor": "@bgColor"
+    "navigationBarBackgroundColor": "#f4eee2",
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#f4eee2"
   },
-  "darkmode": true,
-  "themeLocation": "theme.json",
+  "darkmode": false,
   "sitemapLocation": "sitemap.json",
   "style": "v2",
   "componentFramework": "glass-easel"

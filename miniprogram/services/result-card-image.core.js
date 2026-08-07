@@ -2,6 +2,44 @@ import { formatLunarDateText } from '../domain/calendar/almanac.core.js'
 
 export const RESULT_CARD_BACKGROUND_IMAGE = '/assets/images/result-card-bg.png'
 
+// 断课面（卡背）底图：六象一一对应，压在深色纱罩下衬托浅色文字
+export const RESULT_CARD_BACK_IMAGES = {
+  大安: '/assets/images/card-back-da-an.jpg',
+  留连: '/assets/images/card-back-liu-lian.jpg',
+  速喜: '/assets/images/card-back-su-xi.jpg',
+  赤口: '/assets/images/card-back-chi-kou.jpg',
+  小吉: '/assets/images/card-back-xiao-ji.jpg',
+  空亡: '/assets/images/card-back-kong-wang.jpg',
+}
+
+// 卡背底图统一压缩到 600x1000，画布按此尺寸做 aspectFill 裁剪
+export const RESULT_CARD_BACK_IMAGE_SIZE = { width: 600, height: 1000 }
+
+// 纸纱罩：与首页/起念页 paper-veil 同配方，保字色不压暗画面，
+// 与 pages/result/index.wxss 的 .card-back-veil 同值
+export const RESULT_CARD_BACK_VEIL = {
+  from: 'rgba(247, 242, 231, 0.52)',
+  to: 'rgba(239, 232, 215, 0.62)',
+}
+
+export function getResultCardBackImage(symbol) {
+  return RESULT_CARD_BACK_IMAGES[symbol] || RESULT_CARD_BACK_IMAGES['空亡']
+}
+
+// aspectFill：源图居中裁掉溢出部分，返回 drawImage 的源矩形
+export function getAspectFillCrop(sourceWidth, sourceHeight, targetWidth, targetHeight) {
+  const scale = Math.max(targetWidth / sourceWidth, targetHeight / sourceHeight)
+  const sWidth = Math.round(targetWidth / scale)
+  const sHeight = Math.round(targetHeight / scale)
+
+  return {
+    sx: Math.round((sourceWidth - sWidth) / 2),
+    sy: Math.round((sourceHeight - sHeight) / 2),
+    sWidth,
+    sHeight,
+  }
+}
+
 // 小程序码码位（375x560 逻辑坐标，右下角，避开内框线）。
 // 发布后替换为静态太阳码：见 miniprogram/README.md「结果卡小程序码」。
 export const RESULT_CARD_CODE_SLOT = { x: 265, y: 438, size: 56 }
@@ -121,6 +159,7 @@ export function buildResultCardImageModel(record) {
     brand: '一念六壬',
     methodName: '小六壬',
     backgroundImagePath: RESULT_CARD_BACKGROUND_IMAGE,
+    backImagePath: getResultCardBackImage(symbol),
     miniProgramCodeUrl: record?.mini_program_code_url || '',
     toneStyle: getResultCardToneStyle(symbol),
     symbol,

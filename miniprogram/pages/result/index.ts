@@ -2,7 +2,11 @@ import { buildSharePosterModel } from '../../application/poster-service'
 import {
   buildResultCardImageModel,
   formatLunarTimeText,
+  getAspectFillCrop,
+  getResultCardBackImage,
   getVerticalSymbolLayout,
+  RESULT_CARD_BACK_IMAGE_SIZE,
+  RESULT_CARD_BACK_VEIL,
   RESULT_CARD_CODE_SLOT,
   splitResultSymbol,
   wrapPosterText,
@@ -42,6 +46,7 @@ Page({
     isCardBackVisible: false,
     symbolTone: '',
     symbolChars: [],
+    cardBackImage: '',
     lunarTimeText: '',
     showRepeatNotice: false,
     keyboardHeight: 0,
@@ -57,6 +62,7 @@ Page({
       isCardBackVisible: false,
       symbolTone: getSymbolTone(record),
       symbolChars: splitResultSymbol(record?.rule_result?.symbol),
+      cardBackImage: getResultCardBackImage(record?.rule_result?.symbol),
       lunarTimeText: formatLunarTimeText(record?.rule_result?.input_snapshot),
       showRepeatNotice: options?.repeat === '1',
       keyboardHeight: 0,
@@ -107,7 +113,40 @@ Page({
     ctx.setFillStyle(glow)
     ctx.fillRect(0, 0, RESULT_CARD_WIDTH, RESULT_CARD_HEIGHT)
 
-    ctx.setStrokeStyle(toneStyle.border)
+    this.drawCardFrame(ctx, toneStyle.border)
+  },
+
+  drawBackCardBackground(ctx, model) {
+    // 背面：六象底图 aspectFill 铺满 + 宣纸纱罩（与首页/起念页同配方）
+    const crop = getAspectFillCrop(
+      RESULT_CARD_BACK_IMAGE_SIZE.width,
+      RESULT_CARD_BACK_IMAGE_SIZE.height,
+      RESULT_CARD_WIDTH,
+      RESULT_CARD_HEIGHT,
+    )
+    ctx.drawImage(
+      model.backImagePath,
+      crop.sx,
+      crop.sy,
+      crop.sWidth,
+      crop.sHeight,
+      0,
+      0,
+      RESULT_CARD_WIDTH,
+      RESULT_CARD_HEIGHT,
+    )
+
+    const veil = ctx.createLinearGradient(0, 0, 0, RESULT_CARD_HEIGHT)
+    veil.addColorStop(0, RESULT_CARD_BACK_VEIL.from)
+    veil.addColorStop(1, RESULT_CARD_BACK_VEIL.to)
+    ctx.setFillStyle(veil)
+    ctx.fillRect(0, 0, RESULT_CARD_WIDTH, RESULT_CARD_HEIGHT)
+
+    this.drawCardFrame(ctx, model.toneStyle.border)
+  },
+
+  drawCardFrame(ctx, borderColor) {
+    ctx.setStrokeStyle(borderColor)
     ctx.setLineWidth(1)
     ctx.strokeRect(28, 34, RESULT_CARD_WIDTH - 56, RESULT_CARD_HEIGHT - 68)
 
@@ -115,19 +154,20 @@ Page({
     ctx.strokeRect(38, 44, RESULT_CARD_WIDTH - 76, RESULT_CARD_HEIGHT - 88)
   },
 
-  drawCardChrome(ctx, model) {
+  drawCardChrome(ctx, model, face = 'front') {
+    const isBack = face === 'back'
     // 正背面共用：品牌、方法、印章、码位、免责声明
-    ctx.setFillStyle('rgba(255, 246, 216, 0.92)')
+    ctx.setFillStyle(isBack ? 'rgba(35, 33, 28, 0.72)' : 'rgba(255, 246, 216, 0.92)')
     ctx.setFontSize(20)
     ctx.fillText(model.brand, 48, 72)
 
-    ctx.setFillStyle('rgba(255, 246, 216, 0.66)')
+    ctx.setFillStyle(isBack ? 'rgba(35, 33, 28, 0.56)' : 'rgba(255, 246, 216, 0.66)')
     ctx.setFontSize(15)
     ctx.fillText(`${model.methodName} · ${model.symbol}`, 48, 106)
 
-    ctx.setStrokeStyle('rgba(214, 99, 82, 0.8)')
+    ctx.setStrokeStyle(isBack ? 'rgba(107, 87, 52, 0.56)' : 'rgba(214, 99, 82, 0.8)')
     ctx.strokeRect(286, 56, 42, 42)
-    ctx.setFillStyle('rgba(224, 122, 102, 0.95)')
+    ctx.setFillStyle(isBack ? 'rgba(107, 87, 52, 0.88)' : 'rgba(224, 122, 102, 0.95)')
     ctx.setFontSize(14)
     ctx.fillText('问', 293, 74)
     ctx.fillText('道', 293, 94)
@@ -141,7 +181,7 @@ Page({
         RESULT_CARD_CODE_SLOT.size,
       )
     } else {
-      ctx.setStrokeStyle('rgba(255, 246, 216, 0.32)')
+      ctx.setStrokeStyle(isBack ? 'rgba(35, 33, 28, 0.28)' : 'rgba(255, 246, 216, 0.32)')
       ctx.setLineWidth(1)
       ctx.strokeRect(
         RESULT_CARD_CODE_SLOT.x,
@@ -149,13 +189,13 @@ Page({
         RESULT_CARD_CODE_SLOT.size,
         RESULT_CARD_CODE_SLOT.size,
       )
-      ctx.setFillStyle('rgba(255, 246, 216, 0.5)')
+      ctx.setFillStyle(isBack ? 'rgba(35, 33, 28, 0.42)' : 'rgba(255, 246, 216, 0.5)')
       ctx.setFontSize(13)
       ctx.fillText('问', RESULT_CARD_CODE_SLOT.x + 21, RESULT_CARD_CODE_SLOT.y + 24)
       ctx.fillText('道', RESULT_CARD_CODE_SLOT.x + 21, RESULT_CARD_CODE_SLOT.y + 42)
     }
 
-    ctx.setFillStyle('rgba(255, 246, 216, 0.4)')
+    ctx.setFillStyle(isBack ? 'rgba(35, 33, 28, 0.38)' : 'rgba(255, 246, 216, 0.4)')
     ctx.setFontSize(11)
     ctx.setTextAlign('center')
     ctx.fillText(model.disclaimer, RESULT_CARD_WIDTH / 2, 548)
@@ -182,12 +222,12 @@ Page({
   },
 
   drawBackFace(ctx, model) {
-    // 背面：档位 + 竖排宫位 + 签语 + 行动提示 + 起念时间
-    ctx.setFillStyle('#fff6d8')
+    // 背面：档位 + 竖排宫位 + 签语 + 行动提示 + 起念时间（宣纸面墨色）
+    ctx.setFillStyle('#23211c')
     ctx.setFontSize(76)
     ctx.fillText(model.grade, 48, 194)
 
-    ctx.setFillStyle('rgba(243, 219, 154, 0.92)')
+    ctx.setFillStyle('rgba(107, 79, 42, 0.92)')
     ctx.setFontSize(30)
     getVerticalSymbolLayout(model.symbolChars, {
       centerY: 184,
@@ -197,23 +237,23 @@ Page({
       ctx.fillText(item.char, 136, item.y)
     })
 
-    ctx.setFillStyle('rgba(255, 246, 216, 0.85)')
+    ctx.setFillStyle('#6b4f2a')
     ctx.setFontSize(15)
     wrapPosterText(model.oracleText, 16).slice(0, 3).forEach((line, index) => {
       ctx.fillText(line, 48, 276 + index * 26)
     })
 
-    ctx.setFillStyle('rgba(255, 246, 216, 0.62)')
+    ctx.setFillStyle('rgba(35, 33, 28, 0.78)')
     ctx.setFontSize(14)
     wrapPosterText(model.actionHint, 18).slice(0, 3).forEach((line, index) => {
       ctx.fillText(line, 48, 356 + index * 24)
     })
 
-    ctx.setFillStyle('rgba(255, 246, 216, 0.55)')
+    ctx.setFillStyle('rgba(35, 33, 28, 0.55)')
     ctx.setFontSize(13)
     ctx.fillText(model.createdAtText, 48, 470)
 
-    ctx.setFillStyle('rgba(255, 246, 216, 0.6)')
+    ctx.setFillStyle('rgba(35, 33, 28, 0.6)')
     ctx.setFontSize(14)
     ctx.fillText(model.lunarTimeText, 48, 496)
   },
@@ -222,8 +262,12 @@ Page({
     const model = buildResultCardImageModel(this.data.record)
     const ctx = wx.createCanvasContext(RESULT_CARD_CANVAS_ID, this)
 
-    this.drawCardBackground(ctx, model.toneStyle)
-    this.drawCardChrome(ctx, model)
+    if (face === 'front') {
+      this.drawCardBackground(ctx, model.toneStyle)
+    } else {
+      this.drawBackCardBackground(ctx, model)
+    }
+    this.drawCardChrome(ctx, model, face)
 
     if (face === 'front') {
       this.drawFrontFace(ctx, model)

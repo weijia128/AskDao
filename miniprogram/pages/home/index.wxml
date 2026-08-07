@@ -1,4 +1,5 @@
 <view class="page-shell home-page">
+  <image class="home-bg" src="/assets/images/home-bg.jpg" mode="aspectFill"></image>
   <view class="paper-veil"></view>
 
   <view class="date-header">
@@ -32,6 +33,7 @@
         <image class="bagua-image" src="/assets/images/bagua-taiji.png" mode="aspectFit"></image>
       </view>
       <view class="entry-button">问道</view>
+      <view class="entry-hint">轻点太极 · 起课问道</view>
     </view>
     <view class="ritual-limit">{{dailyLimitText}}</view>
   </view>

@@ -3,7 +3,17 @@
   flex-direction: column;
 }
 
-/* 宣纸底：宋人尺牍，无光晕、无投影 */
+/* 起念底：档案图铺底，纸纱罩层保字色 */
+.page-shell > image.ritual-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+}
+
 .page-shell > view.paper-veil {
   position: fixed;
   top: 0;
@@ -12,13 +22,17 @@
   width: 100vw;
   height: 100vh;
   pointer-events: none;
-  background: linear-gradient(180deg, #f7f2e7 0%, #efe8d7 100%);
+  background: linear-gradient(180deg, rgba(247, 242, 231, 0.55) 0%, rgba(239, 232, 215, 0.65) 100%);
+}
+
+/* 报头：一条发丝线题记 + 一行三不占小注，全页只此一处双线装饰 */
+.ritual-masthead {
+  margin-top: 48rpx;
 }
 
 .ritual-caption {
   display: flex;
   align-items: center;
-  margin-top: 56rpx;
 }
 
 .panel-caption {
@@ -40,28 +54,27 @@
   letter-spacing: 8rpx;
 }
 
+/* 三不占：题记下的小注，不再重复横线，靠字号与浓淡分层 */
+.rules-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 18rpx;
+}
+
+.rules-text {
+  color: #8b8579;
+  font-size: 22rpx;
+  font-family: "Songti SC", serif;
+  letter-spacing: 3rpx;
+  white-space: nowrap;
+}
+
 .ritual-hero {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-top: 72rpx;
-}
-
-/* 三不占：与遇事不决同款发丝横线行，一行收束 */
-.rules-row {
-  display: flex;
-  align-items: center;
-  margin-top: 28rpx;
-}
-
-.rules-text {
-  padding: 0 24rpx;
-  color: #4a463e;
-  font-size: 26rpx;
-  font-family: "Songti SC", serif;
-  font-weight: 600;
-  letter-spacing: 4rpx;
-  white-space: nowrap;
+  margin-top: 64rpx;
 }
 
 .ritual-action {
@@ -108,6 +121,16 @@
   .spinning-ring {
     animation: none;
   }
+
+  .circle::before,
+  .circle::after {
+    animation: none;
+    opacity: 0;
+  }
+
+  .circle {
+    animation: none;
+  }
 }
 
 .circle {
@@ -126,10 +149,63 @@
   border: 2rpx solid rgba(35, 33, 28, 0.5);
   border-radius: 50%;
   transition: border-color 0.2s ease;
+  /* 主体自身也起伏，可点提示才不至于全压在外圈一条线上 */
+  animation: circle-pulse 2.4s ease-in-out infinite;
 }
 
+@keyframes circle-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.03);
+  }
+}
+
+/* 起课中定住：此时圆心在走数字，起伏会读成抖动 */
 .active .circle {
   border-color: rgba(35, 33, 28, 0.72);
+  animation: none;
+}
+
+/* 涟漪：与首页同一套可点提示；起课时让位给旋转环，避免两圈动效打架。
+   两圈错开半个周期，避免单圈淡出后出现「没有任何动静」的空档。 */
+.circle::before,
+.circle::after {
+  content: '';
+  position: absolute;
+  top: -3rpx;
+  right: -3rpx;
+  bottom: -3rpx;
+  left: -3rpx;
+  border: 3rpx solid rgba(35, 33, 28, 0.7);
+  border-radius: 50%;
+  animation: circle-ripple 2.4s ease-out infinite;
+}
+
+/* 负延迟：进页面即处于周期中段，不必等 1.2s 才补上第二圈 */
+.circle::before {
+  animation-delay: -1.2s;
+}
+
+.active .circle::before,
+.active .circle::after {
+  animation: none;
+  opacity: 0;
+}
+
+@keyframes circle-ripple {
+  0% {
+    opacity: 0.7;
+    transform: scale(1);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(1.32);
+  }
 }
 
 .inner {
@@ -149,23 +225,40 @@
 }
 
 .title {
-  margin-top: 44rpx;
+  margin-top: 40rpx;
   color: #23211c;
-  font-size: 40rpx;
+  font-size: 38rpx;
   font-family: "Songti SC", serif;
-  letter-spacing: 4rpx;
+  letter-spacing: 6rpx;
 }
 
-/* 此念手札：一条发丝线下划书写行，聚焦时线加深、显示字数与隐私说明 */
+/* 提示语比正文淡、但要比页脚小注重，否则读成脚注而非可点处 */
+.action-hint {
+  margin-top: 14rpx;
+  color: #6b675c;
+  font-size: 24rpx;
+  letter-spacing: 2rpx;
+}
+
+/* 此念手札：成框的书写格，与页面的装饰横线区分开，明确是可落笔处 */
 .note-entry {
-  margin-top: 48rpx;
-  padding-bottom: 14rpx;
-  border-bottom: 1rpx solid rgba(35, 33, 28, 0.18);
-  transition: border-color 0.2s ease;
+  margin-top: 56rpx;
+  padding: 22rpx 24rpx 20rpx;
+  border: 1rpx solid rgba(35, 33, 28, 0.16);
+  border-radius: 8rpx;
+  background: rgba(255, 252, 245, 0.5);
+  transition: border-color 0.2s ease, background-color 0.2s ease;
 }
 
 .note-entry.focused {
-  border-bottom-color: rgba(35, 33, 28, 0.5);
+  border-color: rgba(35, 33, 28, 0.42);
+  background: rgba(255, 252, 245, 0.85);
+}
+
+.note-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
 }
 
 .note-label {
@@ -175,139 +268,73 @@
   letter-spacing: 6rpx;
 }
 
+.note-meta {
+  color: #a9a296;
+  font-size: 20rpx;
+}
+
 .note-input {
   width: 100%;
   min-height: 44rpx;
-  margin-top: 10rpx;
-  color: #23211c;
-  font-size: 28rpx;
-  line-height: 1.5;
-}
-
-.note-placeholder {
-  color: #b5aea2;
-  font-size: 26rpx;
-}
-
-.note-meta {
-  margin-top: 8rpx;
-  color: #b5aea2;
-  font-size: 20rpx;
-  text-align: right;
-}
-
-.guidance-panel {
-  margin-top: 56rpx;
-}
-
-.guidance-lead {
-  margin-top: 30rpx;
+  margin-top: 14rpx;
   color: #23211c;
   font-size: 28rpx;
   line-height: 1.6;
 }
 
-.guidance-line {
-  margin-top: 20rpx;
+.note-placeholder {
+  color: #b5aea2;
   font-size: 26rpx;
-  line-height: 1.5;
+  font-family: "Songti SC", serif;
+}
+
+.guidance-panel {
+  margin-top: 56rpx;
+  padding-bottom: 24rpx;
+}
+
+.guidance-lead {
+  margin-top: 32rpx;
+  color: #3a382f;
+  font-size: 30rpx;
+  font-family: "Songti SC", serif;
+  line-height: 1.6;
+  letter-spacing: 1rpx;
+}
+
+/* 宜问 / 不宜问：左侧短栏对齐两条例句，朱色为宜、淡墨为忌 */
+.guidance-examples {
+  display: flex;
+  flex-direction: column;
+  margin-top: 26rpx;
+}
+
+.guidance-line {
+  padding-left: 20rpx;
+  border-left: 3rpx solid transparent;
+  font-size: 26rpx;
+  font-family: "Songti SC", serif;
+  line-height: 1.6;
+}
+
+.guidance-line + .guidance-line {
+  margin-top: 18rpx;
 }
 
 .guidance-line.positive {
-  color: #23211c;
+  color: #3a382f;
+  border-left-color: rgba(168, 60, 42, 0.55);
 }
 
 .guidance-line.negative {
   color: #9a948a;
+  border-left-color: rgba(35, 33, 28, 0.14);
 }
 
 .guidance-note {
-  margin-top: 30rpx;
-  color: #b5aea2;
-  font-size: 24rpx;
-  line-height: 1.5;
-}
-
-/* 深色模式：玄墨色板，随系统切换 */
-@media (prefers-color-scheme: dark) {
-  .page-shell > view.paper-veil {
-    background: linear-gradient(180deg, #141614 0%, #0c0e0c 100%);
-  }
-
-  .caption-line {
-    background: rgba(216, 174, 103, 0.22);
-  }
-
-  .caption-text {
-    color: rgba(216, 174, 103, 0.78);
-  }
-
-  .rules-text {
-    color: rgba(246, 239, 226, 0.85);
-  }
-
-  .spinning-ring {
-    border-color: rgba(216, 174, 103, 0.14);
-    border-top-color: #f3db9a;
-  }
-
-  .circle {
-    border-color: rgba(216, 174, 103, 0.55);
-  }
-
-  .active .circle {
-    border-color: rgba(243, 219, 154, 0.78);
-  }
-
-  .inner {
-    color: #f3db9a;
-  }
-
-  .count-symbol {
-    color: #f3db9a;
-  }
-
-  .title {
-    color: #f6efe2;
-  }
-
-  .note-entry {
-    border-bottom-color: rgba(216, 174, 103, 0.28);
-  }
-
-  .note-entry.focused {
-    border-bottom-color: rgba(216, 174, 103, 0.6);
-  }
-
-  .note-label {
-    color: rgba(216, 174, 103, 0.78);
-  }
-
-  .note-input {
-    color: rgba(246, 239, 226, 0.88);
-  }
-
-  .note-placeholder {
-    color: rgba(246, 239, 226, 0.35);
-  }
-
-  .note-meta {
-    color: rgba(246, 239, 226, 0.35);
-  }
-
-  .guidance-lead {
-    color: rgba(246, 239, 226, 0.78);
-  }
-
-  .guidance-line.positive {
-    color: rgba(243, 219, 154, 0.88);
-  }
-
-  .guidance-line.negative {
-    color: rgba(246, 239, 226, 0.5);
-  }
-
-  .guidance-note {
-    color: rgba(246, 239, 226, 0.4);
-  }
+  margin-top: 32rpx;
+  color: #b0a99d;
+  font-size: 23rpx;
+  font-family: "Songti SC", serif;
+  line-height: 1.6;
 }

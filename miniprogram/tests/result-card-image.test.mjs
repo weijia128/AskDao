@@ -4,9 +4,14 @@ import { access, readFile } from 'node:fs/promises'
 
 import {
   RESULT_CARD_BACKGROUND_IMAGE,
+  RESULT_CARD_BACK_IMAGES,
+  RESULT_CARD_BACK_IMAGE_SIZE,
+  RESULT_CARD_BACK_VEIL,
   RESULT_CARD_CODE_SLOT,
   RESULT_CARD_TONE_STYLES,
   buildResultCardImageModel,
+  getAspectFillCrop,
+  getResultCardBackImage,
   getResultCardToneStyle,
   getVerticalSymbolLayout,
   wrapPosterText,
@@ -169,4 +174,50 @@ test('poster text wrapper keeps every line within the configured length', () => 
 
 test('result card background asset exists', async () => {
   await access(new URL(`..${RESULT_CARD_BACKGROUND_IMAGE}`, import.meta.url))
+})
+
+test('result card back images cover all six symbols with a safe fallback', () => {
+  const symbols = ['大安', '留连', '速喜', '赤口', '小吉', '空亡']
+
+  for (const symbol of symbols) {
+    assert.ok(RESULT_CARD_BACK_IMAGES[symbol], `missing back image for ${symbol}`)
+  }
+
+  assert.equal(getResultCardBackImage('速喜'), RESULT_CARD_BACK_IMAGES['速喜'])
+  assert.equal(getResultCardBackImage('未知象'), RESULT_CARD_BACK_IMAGES['空亡'])
+})
+
+test('result card back image assets exist', async () => {
+  for (const imagePath of Object.values(RESULT_CARD_BACK_IMAGES)) {
+    await access(new URL(`..${imagePath}`, import.meta.url))
+  }
+})
+
+test('result card image model carries the back image matching the symbol', () => {
+  const model = buildResultCardImageModel({
+    rule_result: { symbol: '留连', grade: '滞' },
+    interpretation: {},
+  })
+
+  assert.equal(model.backImagePath, RESULT_CARD_BACK_IMAGES['留连'])
+})
+
+test('aspect fill crop keeps the source centered and fully covers the card', () => {
+  const crop = getAspectFillCrop(
+    RESULT_CARD_BACK_IMAGE_SIZE.width,
+    RESULT_CARD_BACK_IMAGE_SIZE.height,
+    375,
+    560,
+  )
+
+  assert.deepEqual(crop, { sx: 0, sy: 52, sWidth: 600, sHeight: 896 })
+})
+
+test('result card drawing paints the back face from the symbol image', async () => {
+  const resultSource = await readFile(new URL('../pages/result/index.ts', import.meta.url), 'utf8')
+
+  assert.match(resultSource, /model\.backImagePath/)
+  assert.match(resultSource, /getAspectFillCrop/)
+  assert.match(resultSource, /RESULT_CARD_BACK_VEIL/)
+  assert.match(resultSource, /drawBackCardBackground/)
 })

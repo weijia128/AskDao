@@ -1,16 +1,16 @@
 <view class="page-shell ritual-page">
+  <image class="ritual-bg" src="/assets/images/ritual-bg.jpg" mode="aspectFill"></image>
   <view class="paper-veil"></view>
 
-  <view class="ritual-caption">
-    <view class="caption-line"></view>
-    <view class="caption-text">遇事不决，六壬决断</view>
-    <view class="caption-line"></view>
-  </view>
-
-  <view class="rules-row">
-    <view class="caption-line"></view>
-    <view class="rules-text">不诚不占 · 不疑不占 · 不义不占</view>
-    <view class="caption-line"></view>
+  <view class="ritual-masthead">
+    <view class="ritual-caption">
+      <view class="caption-line"></view>
+      <view class="caption-text">遇事不决，六壬决断</view>
+      <view class="caption-line"></view>
+    </view>
+    <view class="rules-row">
+      <view class="rules-text">不诚不占 · 不疑不占 · 不义不占</view>
+    </view>
   </view>
 
   <view class="ritual-hero">
@@ -22,10 +22,14 @@
       </view>
     </view>
     <view class="title">心中默念所想</view>
+    <view class="action-hint" wx:if="{{!isDivining}}">轻点起念 · 落课成断</view>
   </view>
 
   <view class="note-entry {{noteFocused ? 'focused' : ''}}">
-    <view class="note-label">此念</view>
+    <view class="note-head">
+      <view class="note-label">此念</view>
+      <view class="note-meta" wx:if="{{noteFocused}}">{{questionText.length}}/60 · 仅存本机，不上传</view>
+    </view>
     <textarea
       class="note-input"
       value="{{questionText}}"
@@ -38,7 +42,6 @@
       bindfocus="handleNoteFocus"
       bindblur="handleNoteBlur"
     ></textarea>
-    <view class="note-meta" wx:if="{{noteFocused}}">{{questionText.length}}/60 · 仅存本机，不上传</view>
   </view>
 
   <view class="guidance-panel">
@@ -48,8 +51,10 @@
       <view class="caption-line"></view>
     </view>
     <view class="guidance-lead">请在心中默问一件小事，一个方向。</view>
-    <view class="guidance-line positive">宜问：这件事今天推进，是否合适？</view>
-    <view class="guidance-line negative">不宜问：我应该怎么办？</view>
+    <view class="guidance-examples">
+      <view class="guidance-line positive">宜问：这件事今天推进，是否合适？</view>
+      <view class="guidance-line negative">不宜问：我应该怎么办？</view>
+    </view>
     <view class="guidance-note">不以玩笑试探，不反复追问同一事。</view>
   </view>
 </view>

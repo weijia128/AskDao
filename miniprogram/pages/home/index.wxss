@@ -5,7 +5,17 @@
   padding-bottom: 32rpx;
 }
 
-/* 宣纸底：宋人尺牍，无光晕、无投影 */
+/* 宣纸底：问道图铺底，纸纱罩层保字色 */
+.page-shell > image.home-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+}
+
 .page-shell > view.paper-veil {
   position: fixed;
   top: 0;
@@ -14,7 +24,7 @@
   width: 100vw;
   height: 100vh;
   pointer-events: none;
-  background: linear-gradient(180deg, #f7f2e7 0%, #efe8d7 100%);
+  background: linear-gradient(180deg, rgba(247, 242, 231, 0.52) 0%, rgba(239, 232, 215, 0.62) 100%);
 }
 
 .date-header {
@@ -60,6 +70,7 @@
 }
 
 .seal-ring {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -69,10 +80,67 @@
   border-radius: 50%;
 }
 
+/* 涟漪：自印章边缘向外扩散后淡出，宣纸底上比静态光晕清楚得多。
+   两圈错开半个周期，避免单圈淡出后出现「没有任何动静」的空档。 */
+.seal-ring::before,
+.seal-ring::after {
+  content: '';
+  position: absolute;
+  top: -3rpx;
+  right: -3rpx;
+  bottom: -3rpx;
+  left: -3rpx;
+  border: 3rpx solid rgba(35, 33, 28, 0.7);
+  border-radius: 50%;
+  animation: seal-ripple 2.4s ease-out infinite;
+}
+
+/* 负延迟：进页面即处于周期中段，不必等 1.2s 才补上第二圈 */
+.seal-ring::before {
+  animation-delay: -1.2s;
+}
+
+@keyframes seal-ripple {
+  0% {
+    opacity: 0.7;
+    transform: scale(1);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(1.32);
+  }
+}
+
 .bagua-image {
   width: 180rpx;
   height: 180rpx;
   border-radius: 50%;
+  /* 主体自身也起伏，可点提示才不至于全压在外圈一条线上 */
+  animation: taiji-pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes taiji-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.03);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .seal-ring::before,
+  .seal-ring::after {
+    animation: none;
+    opacity: 0;
+  }
+
+  .bagua-image {
+    animation: none;
+  }
 }
 
 .entry-button {
@@ -83,6 +151,14 @@
   font-family: "Songti SC", serif;
   font-weight: 700;
   letter-spacing: 14rpx;
+}
+
+/* 提示语比正文淡、但要比页脚小注重，否则读成脚注而非可点处 */
+.entry-hint {
+  margin-top: 12rpx;
+  color: #6b675c;
+  font-size: 24rpx;
+  letter-spacing: 2rpx;
 }
 
 .ritual-limit {
@@ -256,101 +332,4 @@
   font-size: 26rpx;
   letter-spacing: 4rpx;
   border-bottom: 1rpx solid rgba(35, 33, 28, 0.24);
-}
-
-/* 深色模式：玄墨色板，随系统切换 */
-@media (prefers-color-scheme: dark) {
-  .verify-panel {
-    border-color: rgba(214, 199, 160, 0.2);
-    background: rgba(20, 22, 20, 0.62);
-  }
-
-  .verify-time,
-  .verify-symbol {
-    color: rgba(232, 222, 198, 0.62);
-  }
-
-  .verify-note {
-    color: #f2e9d4;
-  }
-
-  .verify-action {
-    color: #e8dec6;
-    border-color: rgba(214, 199, 160, 0.3);
-  }
-
-  .verify-action.muted {
-    color: rgba(232, 222, 198, 0.55);
-    border-color: rgba(214, 199, 160, 0.16);
-  }
-
-  .page-shell > view.paper-veil {
-    background: linear-gradient(180deg, #141614 0%, #0c0e0c 100%);
-  }
-
-  .date-ganzhi {
-    color: rgba(243, 219, 154, 0.9);
-  }
-
-  .date-lunar {
-    color: rgba(246, 239, 226, 0.5);
-  }
-
-  .seal-ring {
-    border-color: rgba(216, 174, 103, 0.55);
-  }
-
-  .entry-button {
-    color: #f3db9a;
-  }
-
-  .ritual-limit {
-    color: rgba(246, 239, 226, 0.5);
-  }
-
-  .caption-line {
-    background: rgba(216, 174, 103, 0.22);
-  }
-
-  .caption-text {
-    color: rgba(216, 174, 103, 0.78);
-  }
-
-  .almanac-meta {
-    color: rgba(246, 239, 226, 0.58);
-  }
-
-  .almanac-label {
-    color: #d8ae67;
-  }
-
-  .almanac-label.muted {
-    color: rgba(246, 239, 226, 0.5);
-  }
-
-  .almanac-item {
-    color: rgba(243, 219, 154, 0.9);
-  }
-
-  .almanac-item.muted {
-    color: rgba(246, 239, 226, 0.5);
-  }
-
-  .almanac-note {
-    color: rgba(246, 239, 226, 0.34);
-  }
-
-  .almanac-update-notice {
-    color: rgba(246, 239, 226, 0.46);
-  }
-
-  .vermillion-seal {
-    color: #f7f2e7;
-    background: #a83c2a;
-  }
-
-  .history-link {
-    color: rgba(216, 174, 103, 0.72);
-    border-bottom-color: rgba(216, 174, 103, 0.32);
-  }
 }

@@ -73,11 +73,15 @@ Beyond the pure-logic tests, `navigation-flow.test.mjs`, `theme-mode.test.mjs`, 
 
 Consequence: editing UI copy, class names, or layout values breaks tests by design. Update the assertion alongside the change — a failing string match usually means an intentional product rule is being reverted, not a stale test. `devtools-config.test.mjs` also asserts a list of deleted files stays deleted.
 
-`assets.test.mjs` enforces image budgets: `page-bg.png` ≤150KB, `result-card-bg.png` ≤180KB, `bagua-taiji.png` ≤80KB (main package limit is 2MB).
+`assets.test.mjs` enforces image budgets: `result-bg.jpg` ≤260KB, `result-card-bg.png` ≤180KB, `bagua-taiji.png` ≤80KB (main package limit is 2MB).
 
 ## Theming
 
-`app.json` sets `darkmode: true` with `theme.json` variables (`@navBgColor`, `@bgColor`, `@navTxtStyle`). Home / ritual / history follow the system theme and need a `@media (prefers-color-scheme: dark)` block in their WXSS. **The result page is always dark** — its `index.json` hardcodes `#10100f`, because the flip card and the saved image share one tone palette.
+**The app is light-only.** `app.json` sets `darkmode: false`, there is no `theme.json`, and all four pages (home / ritual / result / history) hardcode `#f4eee2` + `navigationBarTextStyle: black` in their `index.json`. Do not reintroduce `@media (prefers-color-scheme: dark)` blocks or `@navBgColor`-style theme variables — `theme-mode.test.mjs` asserts both stay gone.
+
+Each page lays its own paper background image under a shared `paper-veil` gradient: `home-bg.jpg`, `ritual-bg.jpg`, `result-bg.jpg` (察象图), `history-bg.jpg`. The retired shared ink background (`page-bg.png` + `.page-background`) stays deleted — `almanac.test.mjs` asserts this.
+
+**The flip card on the result page stays dark** — the card faces and the saved image share one tone palette, drawn over the light page.
 
 Card tones are defined twice and must stay in sync: `pages/result/index.wxss` (`.tone-da-an` … `.tone-kong-wang`) and `services/result-card-image.core.js` (`RESULT_CARD_TONE_STYLES`) for canvas rendering.
 

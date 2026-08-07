@@ -1,4 +1,5 @@
 <view class="page-shell history-page">
+  <image class="history-bg" src="/assets/images/history-bg.jpg" mode="aspectFill"></image>
   <view class="paper-veil"></view>
 
   <view class="title">最近问道</view>
@@ -52,6 +53,7 @@
         <view class="card-preview-cancel" bindtap="handleCancelRecordCardPreview">取消</view>
         <view class="card-preview-save" bindtap="handleConfirmSaveRecordCard">保存到相册</view>
       </view>
+      <view class="card-preview-edit" catchtap="handlePreviewEditVerification">改记验课</view>
     </view>
   </view>
 

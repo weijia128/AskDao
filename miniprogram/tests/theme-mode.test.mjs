@@ -1,55 +1,55 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { readFile } from 'node:fs/promises'
+import { access, readFile } from 'node:fs/promises'
 
 const readText = (path) => readFile(new URL(path, import.meta.url), 'utf8')
 const readJson = async (path) => JSON.parse(await readText(path))
 
-test('app enables system dark mode with a theme file', async () => {
+const LIGHT_BG = '#f4eee2'
+
+test('app pins the light window palette and disables dark mode', async () => {
   const appJson = await readJson('../app.json')
 
-  assert.equal(appJson.darkmode, true)
-  assert.equal(appJson.themeLocation, 'theme.json')
-  assert.equal(appJson.window.navigationBarBackgroundColor, '@navBgColor')
-  assert.equal(appJson.window.navigationBarTextStyle, '@navTxtStyle')
-  assert.equal(appJson.window.backgroundColor, '@bgColor')
+  assert.equal(appJson.darkmode, false)
+  assert.equal(appJson.themeLocation, undefined)
+  assert.equal(appJson.window.navigationBarBackgroundColor, LIGHT_BG)
+  assert.equal(appJson.window.navigationBarTextStyle, 'black')
+  assert.equal(appJson.window.backgroundColor, LIGHT_BG)
 })
 
-test('theme file defines light and dark window variables', async () => {
-  const theme = await readJson('../theme.json')
-
-  assert.equal(theme.light.navBgColor, '#f4eee2')
-  assert.equal(theme.light.navTxtStyle, 'black')
-  assert.equal(theme.light.bgColor, '#f4eee2')
-  assert.equal(theme.dark.navBgColor, '#10100f')
-  assert.equal(theme.dark.navTxtStyle, 'white')
-  assert.equal(theme.dark.bgColor, '#10100f')
+test('theme variable file stays deleted', async () => {
+  await assert.rejects(access(new URL('../theme.json', import.meta.url)))
 })
 
-test('themed pages follow system theme via variables', async () => {
-  for (const page of ['../pages/home/index.json', '../pages/xiao-liuren/index.json', '../pages/history/index.json']) {
+test('themed pages pin the same light palette instead of theme variables', async () => {
+  for (const page of ['../pages/home/index.json', '../pages/xiao-liuren/index.json', '../pages/result/index.json', '../pages/history/index.json']) {
     const pageJson = await readJson(page)
 
-    assert.equal(pageJson.navigationBarBackgroundColor, '@navBgColor')
-    assert.equal(pageJson.navigationBarTextStyle, '@navTxtStyle')
-    assert.equal(pageJson.backgroundColor, '@bgColor')
+    assert.equal(pageJson.navigationBarBackgroundColor, LIGHT_BG)
+    assert.equal(pageJson.navigationBarTextStyle, 'black')
+    assert.equal(pageJson.backgroundColor, LIGHT_BG)
   }
 })
 
-test('result page stays dark in both modes', async () => {
-  const pageJson = await readJson('../pages/result/index.json')
+test('no stylesheet reintroduces a system dark mode override', async () => {
+  const stylesheets = [
+    '../app.wxss',
+    '../pages/home/index.wxss',
+    '../pages/xiao-liuren/index.wxss',
+    '../pages/history/index.wxss',
+    '../pages/result/index.wxss',
+  ]
 
-  assert.equal(pageJson.navigationBarBackgroundColor, '#10100f')
-  assert.equal(pageJson.navigationBarTextStyle, 'white')
-  assert.equal(pageJson.backgroundColor, '#10100f')
+  for (const sheet of stylesheets) {
+    assert.doesNotMatch(await readText(sheet), /prefers-color-scheme/)
+  }
 })
 
-test('themed pages define dark mode style overrides', async () => {
-  for (const page of ['../pages/home/index.wxss', '../pages/xiao-liuren/index.wxss', '../pages/history/index.wxss']) {
+test('light pages drop the retired ink dark palette', async () => {
+  for (const page of ['../pages/home/index.wxss', '../pages/xiao-liuren/index.wxss', '../pages/result/index.wxss', '../pages/history/index.wxss']) {
     const styles = await readText(page)
 
-    assert.match(styles, /@media \(prefers-color-scheme: dark\)/)
-    assert.match(styles, /#141614/)
-    assert.match(styles, /#0c0e0c/)
+    assert.doesNotMatch(styles, /#141614/)
+    assert.doesNotMatch(styles, /#0c0e0c/)
   }
 })

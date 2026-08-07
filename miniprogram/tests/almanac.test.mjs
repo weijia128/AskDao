@@ -179,23 +179,24 @@ test('home page bagua taiji image asset exists', async () => {
   assert.equal(image.isFile(), true)
 })
 
-test('functional pages except home use the shared ink landscape background image', async () => {
+test('every page uses its own paper background image instead of the retired shared ink background', async () => {
   const appJson = await readJson('../app.json')
-  const background = await stat(new URL('../assets/images/page-bg.png', import.meta.url))
   const appStyles = await readText('../app.wxss')
 
-  assert.equal(background.isFile(), true)
-  assert.match(appStyles, /page-background/)
+  await assert.rejects(access(new URL('../assets/images/page-bg.png', import.meta.url)))
+  assert.doesNotMatch(appStyles, /page-background/)
 
-  const inkVeilPages = new Set(['pages/home/index', 'pages/xiao-liuren/index', 'pages/history/index'])
+  const pageBackgrounds = {
+    'pages/home/index': 'home-bg.jpg',
+    'pages/xiao-liuren/index': 'ritual-bg.jpg',
+    'pages/result/index': 'result-bg.jpg',
+    'pages/history/index': 'history-bg.jpg',
+  }
   for (const pagePath of appJson.pages) {
     const markup = await readText(`../${pagePath}.wxml`)
-    if (inkVeilPages.has(pagePath)) {
-      assert.doesNotMatch(markup, /class="page-background"/)
-      continue
-    }
-    assert.match(markup, /class="page-background"/)
-    assert.match(markup, /\/assets\/images\/page-bg\.png/)
+    assert.doesNotMatch(markup, /class="page-background"/)
+    assert.match(markup, new RegExp(`/assets/images/${pageBackgrounds[pagePath]}`))
+    assert.match(markup, /paper-veil/)
   }
 })
 

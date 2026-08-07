@@ -15,29 +15,7 @@ page {
   background: #111310;
 }
 
-.page-background,
-.page-background-shade {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  pointer-events: none;
-}
-
-.page-background {
-  z-index: 0;
-  opacity: 0.88;
-}
-
-.page-background-shade {
-  z-index: 0;
-  background:
-    linear-gradient(180deg, rgba(12, 14, 12, 0.2) 0%, rgba(12, 14, 12, 0.5) 54%, rgba(12, 14, 12, 0.78) 100%),
-    rgba(12, 14, 12, 0.18);
-}
-
-.page-shell > view:not(.page-background-shade),
+.page-shell > view,
 .page-shell > canvas {
   position: relative;
   z-index: 1;

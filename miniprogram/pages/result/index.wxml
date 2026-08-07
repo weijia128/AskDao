@@ -1,6 +1,6 @@
 <view class="page-shell result-page">
-  <image class="page-background" src="/assets/images/page-bg.png" mode="aspectFill"></image>
-  <view class="page-background-shade"></view>
+  <image class="result-bg" src="/assets/images/result-bg.jpg" mode="aspectFill"></image>
+  <view class="paper-veil"></view>
 
   <view
     class="result-card-shell result-card {{symbolTone}} {{isCardBackVisible ? 'flipped' : ''}}"
@@ -17,12 +17,16 @@
       <view class="result-lunar-time">{{lunarTimeText}}</view>
     </view>
     <view class="card-face card-back">
-      <view class="method">小六壬断课 · {{record.rule_result.symbol}}</view>
-      <view class="grade">{{record.rule_result.grade}}</view>
-      <view class="oracle">{{record.interpretation.oracleText}}</view>
-      <view class="text">{{record.interpretation.explanation}}</view>
-      <view class="hint">{{record.interpretation.actionHint}}</view>
-      <view class="disclaimer">{{record.interpretation.disclaimer}}</view>
+      <image class="card-back-bg" src="{{cardBackImage}}" mode="aspectFill"></image>
+      <view class="card-back-veil"></view>
+      <view class="card-back-content">
+        <view class="method">小六壬断课 · {{record.rule_result.symbol}}</view>
+        <view class="grade">{{record.rule_result.grade}}</view>
+        <view class="oracle">{{record.interpretation.oracleText}}</view>
+        <view class="text">{{record.interpretation.explanation}}</view>
+        <view class="hint">{{record.interpretation.actionHint}}</view>
+        <view class="disclaimer">{{record.interpretation.disclaimer}}</view>
+      </view>
     </view>
   </view>
 

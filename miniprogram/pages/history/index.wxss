@@ -1,4 +1,14 @@
-/* 宣纸底，与首页/起念页一致 */
+/* 归档卡底：档案袋铺底，纸纱罩层保字色 */
+.page-shell > image.history-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+}
+
 .page-shell > view.paper-veil {
   position: fixed;
   top: 0;
@@ -7,7 +17,7 @@
   width: 100vw;
   height: 100vh;
   pointer-events: none;
-  background: linear-gradient(180deg, #f7f2e7 0%, #efe8d7 100%);
+  background: linear-gradient(180deg, rgba(247, 242, 231, 0.55) 0%, rgba(239, 232, 215, 0.65) 100%);
 }
 
 .title {
@@ -203,65 +213,11 @@
   border: 1rpx solid rgba(246, 239, 226, 0.4);
 }
 
-/* 深色模式：玄墨色板，随系统切换 */
-@media (prefers-color-scheme: dark) {
-  .page-shell > view.paper-veil {
-    background: linear-gradient(180deg, #141614 0%, #0c0e0c 100%);
-  }
-
-  .title {
-    color: #f6efe2;
-  }
-
-  .delete-action {
-    color: rgba(246, 239, 226, 0.72);
-    background: rgba(15, 17, 15, 0.42);
-    border-left-color: rgba(216, 174, 103, 0.16);
-  }
-
-  .card-action {
-    color: rgba(243, 219, 154, 0.85);
-    background: rgba(15, 17, 15, 0.42);
-    border-left-color: rgba(216, 174, 103, 0.16);
-  }
-
-  .history-card {
-    background: rgba(255, 255, 255, 0.08);
-    border-color: rgba(214, 167, 92, 0.22);
-  }
-
-  .time {
-    color: rgba(246, 239, 226, 0.48);
-  }
-
-  .line {
-    color: #f3db9a;
-  }
-
-  .sub {
-    color: rgba(246, 239, 226, 0.64);
-  }
-
-  .note {
-    color: rgba(243, 219, 154, 0.82);
-  }
-
-  .clear-all-button {
-    color: rgba(224, 122, 102, 0.9);
-    border-color: rgba(224, 122, 102, 0.4);
-  }
-
-  .verify-summary {
-    color: rgba(232, 222, 198, 0.6);
-  }
-
-  .verify-tag {
-    color: rgba(232, 222, 198, 0.72);
-    border-color: rgba(214, 199, 160, 0.28);
-  }
-
-  .verify-card-button {
-    color: #e8dec6;
-    border-color: rgba(214, 199, 160, 0.3);
-  }
+/* 应验卡的改状态入口：弱化成文字链，不与保存主按钮抢视觉 */
+.card-preview-edit {
+  margin-top: 28rpx;
+  padding: 12rpx 24rpx;
+  color: rgba(246, 239, 226, 0.6);
+  font-size: 24rpx;
+  line-height: 1.4;
 }

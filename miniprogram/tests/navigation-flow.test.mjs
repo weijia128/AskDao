@@ -105,7 +105,8 @@ test('history page shows generated time and supports swipe deletion', async () =
   assert.match(historyStyles, /translateX\(-308rpx\)/)
   assert.match(historyStyles, /\.has-card-action/)
   assert.match(historyStyles, /\.delete-action/)
-  assert.match(historyStyles, /\.delete-action\s*{[\s\S]*background: rgba\(15, 17, 15, 0\.42\);/)
+  // 删除键保持低饱和底色，不做刺眼的实心红块
+  assert.match(historyStyles, /\.delete-action\s*{[\s\S]*background: rgba\(168, 60, 42, 0\.08\);/)
   assert.doesNotMatch(historyStyles, /background: rgba\(134, 42, 36/)
 })
 
@@ -146,6 +147,12 @@ test('result card supports saving both front and back faces', async () => {
   assert.match(resultSource, /face,/)
   assert.match(resultSource, /getResultCardImagePath\('back'\)/)
   assert.match(resultSource, /cardImagePaths\?\.back/)
+})
+
+test('share button width includes its padding so it stays inside the shell', async () => {
+  const resultStyles = await readText('../pages/result/index.wxss')
+
+  assert.match(resultStyles, /\.share-button\s*\{[^}]*box-sizing:\s*border-box/)
 })
 
 test('result page shares the generated result card image instead of the app entry', async () => {
@@ -235,6 +242,10 @@ test('result page shows a symbolic front card that flips to interpretation', asy
   assert.match(resultMarkup, /result-lunar-time/)
   assert.match(resultMarkup, /{{lunarTimeText}}/)
   assert.match(resultMarkup, /card-face card-back/)
+  assert.match(resultMarkup, /card-back-bg/)
+  assert.match(resultMarkup, /src="{{cardBackImage}}"/)
+  assert.match(resultMarkup, /card-back-veil/)
+  assert.match(resultMarkup, /card-back-content/)
   assert.match(resultMarkup, /record\.interpretation\.oracleText/)
   assert.match(resultMarkup, /record\.interpretation\.explanation/)
   assert.match(resultMarkup, /catchtap="handleSavePoster"/)
@@ -249,6 +260,8 @@ test('result page shows a symbolic front card that flips to interpretation', asy
   assert.match(resultSource, /lunarTimeText/)
   assert.match(resultSource, /formatLunarTimeText/)
   assert.match(resultSource, /symbolTone/)
+  assert.match(resultSource, /getResultCardBackImage/)
+  assert.match(resultSource, /cardBackImage/)
   assert.match(resultSource, /handleToggleCardFace/)
   for (const symbol of ['大安', '留连', '速喜', '赤口', '小吉', '空亡']) {
     assert.match(resultSource, new RegExp(symbol))
@@ -270,8 +283,52 @@ test('result page shows a symbolic front card that flips to interpretation', asy
 
   assert.doesNotMatch(resultStyles, /^\.card-back\s*{[^}]*background:/m)
   assert.match(resultStyles, /^\.card-back\s*{[^}]*display: flex;[^}]*flex-direction: column;/m)
+  assert.match(resultStyles, /\.card-back-bg[^{]*{[^}]*position: absolute;/)
+  assert.match(resultStyles, /\.card-back-veil\s*{[^}]*background: linear-gradient\(180deg, rgba\(247, 242, 231, 0\.52\) 0%, rgba\(239, 232, 215, 0\.62\) 100%\);/)
+  assert.match(resultStyles, /\.card-back-content\s*{[^}]*flex: 1;[^}]*overflow-y: auto;/)
   assert.match(resultStyles, /^\.text\s*{[^}]*margin-top: auto;/m)
   assert.match(resultStyles, /^\.disclaimer\s*{[^}]*margin-top: auto;/m)
+})
+
+// 首页太极章与起念页圆环都只是「细线圆环 + 宋体字」，不加提示会读成装饰印章而非可点控件。
+test('home and ritual entries advertise that they are tappable', async () => {
+  const homeMarkup = await readText('../pages/home/index.wxml')
+  const homeStyles = await readText('../pages/home/index.wxss')
+  const ritualMarkup = await readText('../pages/xiao-liuren/index.wxml')
+  const ritualStyles = await readText('../pages/xiao-liuren/index.wxss')
+
+  assert.match(homeMarkup, /entry-hint/)
+  assert.match(homeMarkup, /轻点太极 · 起课问道/)
+  assert.match(ritualMarkup, /action-hint/)
+  assert.match(ritualMarkup, /轻点起念 · 落课成断/)
+
+  // 扩散涟漪，不是此前几乎不可见的静态光晕
+  assert.match(homeStyles, /@keyframes seal-ripple/)
+  assert.match(homeStyles, /\.seal-ring::after/)
+  assert.match(ritualStyles, /@keyframes circle-ripple/)
+  assert.match(ritualStyles, /\.circle::after/)
+  assert.doesNotMatch(homeStyles, /seal-breathe/)
+
+  // 双圈错开半个周期：单圈淡出后不能出现「没有任何动静」的空档
+  assert.match(homeStyles, /\.seal-ring::before/)
+  assert.match(homeStyles, /\.seal-ring::before\s*{[^}]*animation-delay: -1\.2s;/)
+  assert.match(ritualStyles, /\.circle::before/)
+  assert.match(ritualStyles, /\.circle::before\s*{[^}]*animation-delay: -1\.2s;/)
+
+  // 主体自身起伏，可点提示不能全压在外圈一条线上
+  assert.match(homeStyles, /@keyframes taiji-pulse/)
+  assert.match(homeStyles, /\.bagua-image\s*{[^}]*animation: taiji-pulse/)
+  assert.match(ritualStyles, /@keyframes circle-pulse/)
+  assert.match(ritualStyles, /^\.circle\s*{[^}]*animation: circle-pulse/m)
+
+  // 起课过程中让位给旋转环，避免两圈动效打架；圆心走数字时起伏会读成抖动
+  assert.match(ritualMarkup, /wx:if="{{!isDivining}}"/)
+  assert.match(ritualStyles, /\.active \.circle::after\s*{[^}]*animation: none;/)
+  assert.match(ritualStyles, /^\.active \.circle\s*{[^}]*animation: none;/m)
+
+  // 提示语需重于页脚小注，否则读成脚注
+  assert.match(homeStyles, /\.entry-hint\s*{[^}]*color: #6b675c;/)
+  assert.match(ritualStyles, /\.action-hint\s*{[^}]*color: #6b675c;/)
 })
 
 test('ritual page offers an optional thought note line saved with the record', async () => {
